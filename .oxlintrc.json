@@ -1,0 +1,41 @@
+{
+  "ignorePatterns": [
+    "node_modules/**",
+    "**/node_modules/**",
+    "build/**",
+    "dist/**",
+    "**/workbox-*/**",
+    "**/@sinonjs/**",
+    "**/prop-types/**"
+  ],
+  "env": {
+    "browser": true,
+    "node": true,
+    "amd": true,
+    "commonjs": true,
+    "serviceworker": true,
+    "worker": true,
+    "mocha": true
+  },
+  "globals": {
+    "define": "readonly",
+    "module": "readonly",
+    "exports": "readonly",
+    "require": "readonly",
+    "_": "readonly",
+    "workbox": "readonly",
+    "FetchEvent": "readonly",
+    "ExtendableEvent": "readonly",
+    "before": "readonly",
+    "after": "readonly",
+    "beforeEach": "readonly",
+    "afterEach": "readonly",
+    "context": "readonly",
+    "describe": "readonly",
+    "it": "readonly"
+  },
+  "rules": {
+    "no-undef": "off",
+    "no-unused-vars": "off"
+  }
+}
