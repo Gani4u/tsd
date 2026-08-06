@@ -1,0 +1,292 @@
+import React, { useState } from "react";
+import { Shield, ArrowRight, CreditCard, Smartphone } from "lucide-react";
+import { api, formatINR, formatApiError } from "../lib/api";
+import ProductImage from "./ProductImage";
+
+const RZP_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+function loadRazorpay() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
+    const existing = document.querySelector(`script[src="${RZP_SRC}"]`);
+    if (existing) {
+      existing.addEventListener("load", () => resolve(true));
+      existing.addEventListener("error", () => resolve(false));
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = RZP_SRC;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+export default function CheckoutForm({ items, onSuccess }) {
+  const [method, setMethod] = useState("cod"); // 'razorpay' | 'cod'
+  const [form, setForm] = useState({
+    name: "", email: "", phone: "", address: "", city: "", pincode: "",
+  });
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const total = subtotal;
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const payItems = items.map((i) => ({
+    product_id: i.product_id,
+    quantity: i.quantity,
+  }));
+  const submit = async (e) => {
+    e.preventDefault();
+    if (items.length === 0) return;
+    setErr("");
+    setBusy(true);
+    try {
+      // 1. Create order on PHP Backend
+      let order;
+      if(method==="cod"){
+          const res = await api.post("/orders",{
+              customer:form,
+              items:payItems,
+              payment_method:"COD"
+          });
+          order = res.data;
+      }
+      else{
+          const res = await api.post("/payment/create-order",{
+              customer:form,
+              items:payItems
+          });
+          order = res.data;
+      }
+
+      if (method === "cod") {
+        setBusy(false);
+        onSuccess(order.order_id || order.id);
+      } else {
+        // 2. Razorpay Flow
+        const ok = await loadRazorpay();
+        if (!ok) {
+          setErr("Failed to load Razorpay Checkout SDK");
+          setBusy(false);
+          return;
+        }
+
+        const rzp = new window.Razorpay({
+          key: order.key_id,
+          amount: order.amount,
+          currency: order.currency || "INR",
+          order_id: order.razorpay_order_id,
+          name: "TSD World",
+          description: "Premium audio & tech",
+          prefill: {
+            name: form.name,
+            email: form.email,
+            contact: form.phone,
+          },
+          theme: { color: "#FF4500" },
+          modal: {
+            ondismiss: () => {
+              setErr("Payment cancelled by user");
+              setBusy(false);
+            },
+          },
+          handler:async(response)=>{
+            try{
+                const verify = await api.post("/payment/verify",{
+                    customer:form,
+                    items:payItems,
+                    payment_method:"RAZORPAY",
+                    razorpay_order_id:
+                        response.razorpay_order_id,
+                    razorpay_payment_id:
+                        response.razorpay_payment_id,
+                    razorpay_signature:
+                        response.razorpay_signature
+                });
+                setBusy(false);
+                onSuccess(verify.data.order_id);
+            }
+            catch(err){
+                setBusy(false);
+                setErr("Payment verification failed");
+            }
+        }
+        });
+        rzp.open();
+      }
+    } catch (apiErr) {
+      setErr(formatApiError(apiErr) || "Failed to create order. Please try again.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
+      <form onSubmit={submit} className="card p-6 space-y-6">
+        <div>
+          <h2 className="font-display text-xl font-bold">Shipping Details</h2>
+          <p className="muted text-sm mt-1">Where should we drop your sound gear?</p>
+        </div>
+
+        {/* Payment method selection */}
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => setMethod("cod")}
+            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${
+              method === "cod" ? "border-brand bg-brand/5 text-current shadow-glow" : "border-token muted hover:text-current"
+            }`}
+          >
+            <Smartphone size={20} className={method === "cod" ? "text-brand" : ""} />
+            <span className="text-sm font-semibold mt-2">Cash on Delivery</span>
+            <span className="text-[10px] muted mt-1">Pay at delivery point</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMethod("razorpay")}
+            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${
+              method === "razorpay" ? "border-brand bg-brand/5 text-current shadow-glow" : "border-token muted hover:text-current"
+            }`}
+          >
+            <CreditCard size={20} className={method === "razorpay" ? "text-brand" : ""} />
+            <span className="text-sm font-semibold mt-2">Pay Online</span>
+            <span className="text-[10px] muted mt-1">UPI, Cards, Netbanking</span>
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="label-caps muted">Full Name</label>
+            <input
+              required
+              data-testid="co-name"
+              className="input mt-2"
+              value={form.name}
+              onChange={set("name")}
+              placeholder="Aravind Kumar"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label-caps muted">Email Address</label>
+              <input
+                required
+                type="email"
+                data-testid="co-email"
+                className="input mt-2"
+                value={form.email}
+                onChange={set("email")}
+                placeholder="you@gmail.com"
+              />
+            </div>
+            <div>
+              <label className="label-caps muted">Phone Number</label>
+              <input
+                required
+                data-testid="co-phone"
+                className="input mt-2"
+                value={form.phone}
+                onChange={set("phone")}
+                inputMode="tel"
+                placeholder="+91 99000 00000"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="label-caps muted">Street Address</label>
+            <textarea
+              required
+              rows={2}
+              data-testid="co-address"
+              className="input mt-2"
+              value={form.address}
+              onChange={set("address")}
+              placeholder="House/Flat No, Apartment/Street, Landmark"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label-caps muted">City</label>
+              <input
+                required
+                data-testid="co-city"
+                className="input mt-2"
+                value={form.city}
+                onChange={set("city")}
+                placeholder="Bengaluru"
+              />
+            </div>
+            <div>
+              <label className="label-caps muted">Pincode</label>
+              <input
+                required
+                data-testid="co-pincode"
+                className="input mt-2"
+                value={form.pincode}
+                onChange={set("pincode")}
+                inputMode="numeric"
+                placeholder="560001"
+              />
+            </div>
+          </div>
+        </div>
+
+        {err && <div className="text-sm text-red-500 font-semibold" data-testid="checkout-error">{err}</div>}
+
+        <button
+          type="submit"
+          disabled={busy || items.length === 0}
+          data-testid="checkout-pay-btn"
+          className="btn-primary w-full justify-center py-3 text-base"
+        >
+          {busy
+            ? (method === "razorpay" ? "Loading payment screen..." : "Booking order...")
+            : (
+              <>
+                Confirm order · {formatINR(total)} <ArrowRight size={16} />
+              </>
+            )}
+        </button>
+
+        <div className="flex items-center justify-center gap-2 text-xs muted">
+          <Shield size={14} className="text-brand" />
+          Secure checkout handled by direct TSD systems.
+        </div>
+      </form>
+
+      <aside className="card p-6 divide-y divider space-y-4">
+        <div>
+          <h3 className="font-display font-bold">Order Summary</h3>
+          <p className="muted text-xs mt-0.5">{items.reduce((s, i) => s + i.quantity, 0)} items in bag</p>
+        </div>
+
+        <div className="pt-4 space-y-3 max-h-64 overflow-y-auto pr-1">
+          {items.map((i) => (
+            <div key={i.product_id} className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0">
+                <ProductImage src={i.image_url} name={i.name} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">{i.name}</div>
+                <div className="text-xs muted">Qty {i.quantity}</div>
+              </div>
+              <div className="text-sm font-semibold">{formatINR(i.price * i.quantity)}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-4 space-y-2 text-sm">
+          <div className="flex justify-between"><span className="muted">Subtotal</span><span>{formatINR(subtotal)}</span></div>
+          <div className="flex justify-between"><span className="muted">Shipping</span><span className="text-brand">Free</span></div>
+          <div className="flex justify-between font-display font-bold text-lg pt-2 border-t divider mt-2">
+            <span>Total</span><span>{formatINR(total)}</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}

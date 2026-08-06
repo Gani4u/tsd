@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Cpu, Bolt, Headphones, ShieldCheck, Sparkles, MapPin, Mail, Phone } from "lucide-react";
-import { api, formatINR } from "../lib/api";
+import { api } from "../lib/api";
 import ProductCard from "../components/ProductCard";
 
 const HERO_IMG = "https://images.pexels.com/photos/6867267/pexels-photo-6867267.jpeg";
@@ -9,18 +9,16 @@ const LOGO_3D = "https://customer-assets-agu9un31.emergentagent.net/job_tsd-elec
 
 export default function Home() {
   const [products, setProducts] = useState([]);
-  const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const [allRes, featRes] = await Promise.all([
-          api.get("/products", { params: { limit: 8 } }),
-          api.get("/products", { params: { featured: true, limit: 6 } }),
-        ]);
-        setProducts(allRes.data);
-        setFeatured(featRes.data);
+        const res = await api.get("/products");
+console.log(res.data);
+setProducts(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
       } finally {
         setLoading(false);
       }
@@ -28,7 +26,7 @@ export default function Home() {
   }, []);
 
   const hasAny = products.length > 0;
-  const featuredList = featured.length > 0 ? featured : products.slice(0, 6);
+  const featuredList = products.slice(0, 6);
 
   return (
     <div>
@@ -226,8 +224,7 @@ function EmptyState() {
         <Sparkles className="text-brand" />
       </div>
       <h3 className="mt-4 font-display text-2xl font-bold">The shelves are still warming up.</h3>
-      <p className="muted mt-2">Head to <span className="font-semibold">/admin</span> to add your first product — it'll appear here instantly.</p>
-      <Link to="/admin" className="btn-primary mt-6 inline-flex">Open Admin</Link>
+      <p className="muted mt-2">New premium audio gear dropping soon. Stay tuned!</p>
     </div>
   );
 }

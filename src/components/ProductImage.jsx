@@ -9,10 +9,13 @@ function hash(str = "") {
 }
 
 export default function ProductImage({ src, name = "TSD", className = "" }) {
-  if (src) {
+  const backendURL = process.env.REACT_APP_BACKEND_URL || "";
+  const imageSrc = src ? `${backendURL}/${src}` : null;
+
+  if (imageSrc) {
     return (
       <img
-        src={src}
+        src={imageSrc}
         alt={name}
         loading="lazy"
         className={`w-full h-full object-cover ${className}`}

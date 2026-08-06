@@ -1,15 +1,9 @@
 import axios from "axios";
 
-const BASE = process.env.REACT_APP_BACKEND_URL;
-export const API = `${BASE}/api`;
+const BASE = process.env.REACT_APP_BACKEND_URL || "";
+export const API = `${BASE}/api/`;
 
 export const api = axios.create({ baseURL: API });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("tsd-token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
 
 export const formatINR = (n) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(n || 0));
@@ -21,3 +15,6 @@ export function formatApiError(err) {
   if (Array.isArray(d)) return d.map((e) => e?.msg || JSON.stringify(e)).join(" ");
   return typeof d === "object" ? (d.msg || JSON.stringify(d)) : String(d);
 }
+
+export default api;
+

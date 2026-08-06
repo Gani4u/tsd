@@ -64,9 +64,6 @@ export default function Header() {
               </span>
             )}
           </button>
-          <Link to="/admin" className="btn-ghost !py-2 !px-4 text-sm hidden sm:inline-flex" data-testid="admin-link">
-            Admin
-          </Link>
         </div>
       </div>
     </header>
