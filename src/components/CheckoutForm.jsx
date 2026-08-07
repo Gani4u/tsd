@@ -24,8 +24,15 @@ function loadRazorpay() {
 
 export default function CheckoutForm({ items, onSuccess }) {
   const [method, setMethod] = useState("cod"); // 'razorpay' | 'cod'
+  // 1. ADDED state FIELD HERE
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", address: "", city: "", pincode: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -39,6 +46,7 @@ export default function CheckoutForm({ items, onSuccess }) {
     product_id: i.product_id,
     quantity: i.quantity,
   }));
+
   const submit = async (e) => {
     e.preventDefault();
     if (items.length === 0) return;
@@ -47,20 +55,19 @@ export default function CheckoutForm({ items, onSuccess }) {
     try {
       // 1. Create order on PHP Backend
       let order;
-      if(method==="cod"){
-          const res = await api.post("/orders",{
-              customer:form,
-              items:payItems,
-              payment_method:"COD"
-          });
-          order = res.data;
-      }
-      else{
-          const res = await api.post("/payment/create-order",{
-              customer:form,
-              items:payItems
-          });
-          order = res.data;
+      if (method === "cod") {
+        const res = await api.post("/orders", {
+          customer: form,
+          items: payItems,
+          payment_method: "COD",
+        });
+        order = res.data;
+      } else {
+        const res = await api.post("/payment/create-order", {
+          customer: form,
+          items: payItems,
+        });
+        order = res.data;
       }
 
       if (method === "cod") {
@@ -94,27 +101,34 @@ export default function CheckoutForm({ items, onSuccess }) {
               setBusy(false);
             },
           },
-          handler:async(response)=>{
-            try{
-                const verify = await api.post("/payment/verify",{
-                    customer:form,
-                    items:payItems,
-                    payment_method:"RAZORPAY",
-                    razorpay_order_id:
-                        response.razorpay_order_id,
-                    razorpay_payment_id:
-                        response.razorpay_payment_id,
-                    razorpay_signature:
-                        response.razorpay_signature
-                });
-                setBusy(false);
-                onSuccess(verify.data.order_id);
-            }
-            catch(err){
-                setBusy(false);
-                setErr("Payment verification failed");
-            }
-        }
+          handler: async (response) => {
+            try {
+              const verify = await api.post("/payment/verify", {
+                customer: form,
+                items: payItems,
+                payment_method: "RAZORPAY",
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              setBusy(false);
+              onSuccess(verify.data.order_id);
+            }catch (err) {
+
+              console.error("VERIFY ERROR", err);
+
+              console.log(err.response);
+
+              console.log(err.response?.data);
+
+              setBusy(false);
+
+              setErr(
+                  err.response?.data?.message ||
+                  "Payment verification failed"
+              );
+          }
+          },
         });
         rzp.open();
       }
@@ -208,7 +222,9 @@ export default function CheckoutForm({ items, onSuccess }) {
               placeholder="House/Flat No, Apartment/Street, Landmark"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+
+          {/* 2. UPDATED LOCATION GRID TO INCLUDE STATE */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="label-caps muted">City</label>
               <input
@@ -218,6 +234,17 @@ export default function CheckoutForm({ items, onSuccess }) {
                 value={form.city}
                 onChange={set("city")}
                 placeholder="Bengaluru"
+              />
+            </div>
+            <div>
+              <label className="label-caps muted">State</label>
+              <input
+                required
+                data-testid="co-state"
+                className="input mt-2"
+                value={form.state}
+                onChange={set("state")}
+                placeholder="Karnataka"
               />
             </div>
             <div>
