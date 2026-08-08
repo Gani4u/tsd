@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Cpu, Bolt, Headphones, ShieldCheck, Sparkles, MapPin, Mail, Phone } from "lucide-react";
-import { api } from "../lib/api";
+import { getProducts } from "../lib/api";
 import ProductCard from "../components/ProductCard";
 
 const HERO_IMG = "https://images.pexels.com/photos/6867267/pexels-photo-6867267.jpeg";
@@ -14,9 +14,8 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get("/products");
-console.log(res.data);
-setProducts(Array.isArray(res.data) ? res.data : []);
+        const data = await getProducts();
+        setProducts(data);
       } catch (err) {
         console.error("Failed to fetch products", err);
       } finally {

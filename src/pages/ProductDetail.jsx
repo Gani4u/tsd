@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Truck, RefreshCcw, ShoppingBag, Zap } from "lucide-react";
-import { api, formatINR } from "../lib/api";
+import { getProductById, formatINR } from "../lib/api";
 import ProductImage from "../components/ProductImage";
 import { useCart } from "../context/CartContext";
 
@@ -18,8 +18,7 @@ export default function ProductDetail() {
       setLoading(true);
       setNotFound(false);
       try {
-        const { data } = await api.get("/products", { params: { id } });
-        const prod = Array.isArray(data) ? data.find((p) => String(p.id) === String(id)) : data;
+        const prod = await getProductById(id);
         if (!prod) throw new Error("Product not found");
         setProduct(prod);
       } catch (err) {

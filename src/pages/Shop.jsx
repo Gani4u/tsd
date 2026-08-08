@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { api } from "../lib/api";
+import { getProducts } from "../lib/api";
 import ProductCard from "../components/ProductCard";
 import { Search } from "lucide-react";
 
@@ -12,12 +12,8 @@ export default function Shop() {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/products", {
-          params: {
-            search: q,
-          },
-        });
-        setProducts(res.data || []);
+        const data = await getProducts(q);
+        setProducts(data);
       } catch (err) {
         console.error(err);
       } finally {

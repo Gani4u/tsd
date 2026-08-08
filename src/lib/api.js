@@ -16,5 +16,34 @@ export function formatApiError(err) {
   return typeof d === "object" ? (d.msg || JSON.stringify(d)) : String(d);
 }
 
-export default api;
+export const getProducts = async (searchOrParams = "") => {
+  const params =
+    typeof searchOrParams === "string"
+      ? (searchOrParams ? { search: searchOrParams } : {})
+      : (searchOrParams || {});
+  const response = await api.get("/products", { params });
+  const data = response.data;
+  if (Array.isArray(data)) return data;
+  if (data && Array.isArray(data.products)) return data.products;
+  return [];
+};
 
+export const getProductById = async (id) => {
+  const response = await api.get("/products", { params: { id } });
+  const data = response.data;
+  if (Array.isArray(data)) {
+    return data.find((p) => String(p.id) === String(id)) || null;
+  }
+  if (data && Array.isArray(data.products)) {
+    return data.products.find((p) => String(p.id) === String(id)) || null;
+  }
+  if (data && data.product) {
+    return data.product;
+  }
+  if (data && typeof data === "object" && data.id) {
+    return data;
+  }
+  return null;
+};
+
+export default api;
