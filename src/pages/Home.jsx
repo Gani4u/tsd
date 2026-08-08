@@ -24,8 +24,8 @@ export default function Home() {
     })();
   }, []);
 
-  const hasAny = products.length > 0;
   const featuredList = products.slice(0, 6);
+  const hasAny = featuredList.length > 0;
 
   return (
     <div>
