@@ -19,7 +19,7 @@ export default function ProductDetail() {
       setNotFound(false);
       try {
         const { data } = await api.get("/products", { params: { id } });
-        const prod = Array.isArray(data) ? data[0] : data;
+        const prod = Array.isArray(data) ? data.find((p) => String(p.id) === String(id)) : data;
         if (!prod) throw new Error("Product not found");
         setProduct(prod);
       } catch (err) {
