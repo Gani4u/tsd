@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, Truck, RefreshCcw, ShoppingBag, Zap } from "lucide-react";
 import { getProductById, formatINR } from "../lib/api";
-import ProductImage from "../components/ProductImage";
+import ProductGallerySlider from "../components/ProductGallerySlider";
 import { useCart } from "../context/CartContext";
 
 export default function ProductDetail() {
@@ -30,17 +30,32 @@ export default function ProductDetail() {
     })();
   }, [id]);
 
-  const gallery = useMemo(() => {
-    return product && product.thumbnail ? [product.thumbnail] : [];
-  }, [product]);
+  if (loading) {
+    return (
+      <div className="container-x py-20">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
+          <div className="aspect-square card animate-pulse" />
+          <div className="space-y-6">
+            <div className="h-10 w-3/4 card animate-pulse" />
+            <div className="h-12 w-1/3 card animate-pulse" />
+            <div className="h-12 w-1/2 card animate-pulse" />
+            <div className="h-32 card animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  if (loading) return <div className="container-x py-20"><div className="h-96 card animate-pulse" /></div>;
-  if (notFound || !product) return (
-    <div className="container-x py-24 text-center">
-      <h1 className="font-display text-3xl font-bold">Product not found.</h1>
-      <Link to="/shop" className="btn-primary mt-6 inline-flex">Back to shop</Link>
-    </div>
-  );
+  if (notFound || !product) {
+    return (
+      <div className="container-x py-24 text-center">
+        <h1 className="font-display text-3xl font-bold">Product not found.</h1>
+        <Link to="/shop" className="btn-primary mt-6 inline-flex">
+          Back to shop
+        </Link>
+      </div>
+    );
+  }
 
   const disabled = product.stock <= 0;
 
@@ -52,27 +67,41 @@ export default function ProductDetail() {
 
   return (
     <div className="container-x py-8 md:py-14">
-      <Link to="/shop" className="inline-flex items-center gap-2 text-sm muted hover:text-brand mb-6" data-testid="back-to-shop">
+      <Link
+        to="/shop"
+        className="inline-flex items-center gap-2 text-sm muted hover:text-brand mb-6 transition"
+        data-testid="back-to-shop"
+      >
         <ArrowLeft size={14} /> Back to shop
       </Link>
 
-      <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+        {/* PRODUCT GALLERY WITH SMOOTH SLIDING TRANSITION */}
+        <div data-testid="product-hero-image">
+          <ProductGallerySlider product={product} disabled={disabled} />
+        </div>
+
+        {/* PRODUCT DETAILS */}
         <div>
-          <div className="relative aspect-square rounded-3xl overflow-hidden border border-token surface" data-testid="product-hero-image">
-            <ProductImage src={gallery[0]} name={product.name} />
+          <h1
+            className="font-display font-extrabold text-4xl md:text-5xl tracking-tight"
+            data-testid="product-name"
+          >
+            {product.name}
+          </h1>
+
+          <div className="mt-6 flex items-baseline gap-3 flex-wrap">
+            <span
+              className="font-display text-5xl font-black text-brand"
+              data-testid="product-price"
+            >
+              {formatINR(product.price)}
+            </span>
             {disabled && (
-              <span className="absolute top-4 left-4 chip !bg-red-500/80 !text-white !border-transparent backdrop-blur">
+              <span className="chip !bg-red-500/10 !border-red-500/30 !text-red-500 font-bold">
                 Out of Stock
               </span>
             )}
-          </div>
-        </div>
-
-        <div>
-          <h1 className="mt-2 font-display font-extrabold text-4xl md:text-5xl tracking-tight" data-testid="product-name">{product.name}</h1>
-          
-          <div className="mt-6 flex items-baseline gap-3 flex-wrap">
-            <span className="font-display text-5xl font-black text-brand" data-testid="product-price">{formatINR(product.price)}</span>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -80,7 +109,7 @@ export default function ProductDetail() {
               disabled={disabled}
               data-testid="buy-btn"
               onClick={startBuyNow}
-              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed shadow-glow"
             >
               <Zap size={16} /> {disabled ? "Out of Stock" : "Buy Now"}
             </button>
@@ -101,7 +130,8 @@ export default function ProductDetail() {
               { icon: <RefreshCcw size={16} className="text-brand" />, t: "7-day Returns" },
             ].map((f) => (
               <div key={f.t} className="card px-4 py-3 flex items-center gap-2">
-                {f.icon}<span className="text-xs font-semibold">{f.t}</span>
+                {f.icon}
+                <span className="text-xs font-semibold">{f.t}</span>
               </div>
             ))}
           </div>
@@ -109,7 +139,9 @@ export default function ProductDetail() {
           {product.description && (
             <div className="mt-10">
               <h3 className="font-display font-bold text-xl">Overview</h3>
-              <p className="mt-3 muted whitespace-pre-line text-base leading-relaxed">{product.description}</p>
+              <p className="mt-3 muted whitespace-pre-line text-base leading-relaxed">
+                {product.description}
+              </p>
             </div>
           )}
         </div>

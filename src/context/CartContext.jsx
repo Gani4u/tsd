@@ -30,13 +30,24 @@ export function CartProvider({ children }) {
     };
         return next;
       }
+      const firstImg =
+        product.thumbnail ||
+        (Array.isArray(product.images) && product.images[0]
+          ? typeof product.images[0] === "string"
+            ? product.images[0]
+            : product.images[0]?.image_url || product.images[0]?.url || ""
+          : "") ||
+        product.image_url ||
+        product.image ||
+        "";
+
       return [
         ...prev,
         {
           product_id: product.id,
           name: product.name,
           price: product.price,
-          image_url: product.image_url || "",
+          image_url: firstImg,
           quantity: qty,
           stock: product.stock
         },
