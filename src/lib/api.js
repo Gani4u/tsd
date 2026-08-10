@@ -8,6 +8,28 @@ export const api = axios.create({ baseURL: API });
 export const formatINR = (n) =>
   new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(Number(n || 0));
 
+/**
+ * Calculates displayed MRP, discounted price, savings and discount percentage
+ * e.g., if price is ₹70, MRP is ₹100, saving is ₹30 (30% OFF)
+ */
+export function calculatePriceDetails(price) {
+  const sellingPrice = Math.max(0, Number(price) || 0);
+  if (sellingPrice === 0) {
+    return { price: 0, mrp: 0, savings: 0, discountPercent: 0 };
+  }
+  // Standard 30% discount ratio (sellingPrice = mrp * 0.7 => mrp = sellingPrice / 0.7)
+  const mrp = Math.round(sellingPrice / 0.7);
+  const savings = Math.max(0, mrp - sellingPrice);
+  const discountPercent = mrp > 0 ? Math.round((savings / mrp) * 100) : 30;
+
+  return {
+    price: sellingPrice,
+    mrp,
+    savings,
+    discountPercent,
+  };
+}
+
 export function formatApiError(err) {
   const d = err?.response?.data?.detail;
   if (!d) return err?.message || "Something went wrong";

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, X, Sparkles, Play, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, X, Tag, Play, Pause } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductImage, { getProductGallery, getResolvedImageUrl } from "./ProductImage";
 
@@ -106,10 +106,10 @@ export default function ProductGallerySlider({
   }
 
   return (
-    <div className={`flex flex-col gap-4 select-none ${className}`} data-testid="product-gallery-slider">
+    <div className={`flex flex-col gap-3 sm:gap-4 select-none ${className}`} data-testid="product-gallery-slider">
       {/* MAIN HERO CAROUSEL */}
       <div
-        className="relative aspect-square rounded-3xl overflow-hidden border border-token surface group cursor-grab active:cursor-grabbing shadow-card"
+        className="relative aspect-square rounded-2xl sm:rounded-3xl overflow-hidden border border-token surface group cursor-grab active:cursor-grabbing shadow-card"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -131,9 +131,9 @@ export default function ProductGallerySlider({
             dragElastic={0.7}
             onDragEnd={(e, { offset, velocity }) => {
               const swipe = swipePower(offset.x, velocity.x);
-              if (swipe < -swipeConfidenceThreshold || offset.x < -60) {
+              if (swipe < -swipeConfidenceThreshold || offset.x < -50) {
                 paginate(1);
-              } else if (swipe > swipeConfidenceThreshold || offset.x > 60) {
+              } else if (swipe > swipeConfidenceThreshold || offset.x > 50) {
                 paginate(-1);
               }
             }}
@@ -150,30 +150,30 @@ export default function ProductGallerySlider({
 
         {/* OVERLAYS & BADGES */}
         {disabled ? (
-          <span className="absolute top-4 left-4 chip !bg-red-500/90 !text-white !border-transparent backdrop-blur-md z-20 font-semibold shadow-md">
+          <span className="absolute top-3 sm:top-4 left-3 sm:left-4 chip !bg-red-500/90 !text-white !border-transparent backdrop-blur-md z-20 font-semibold text-[11px] sm:text-xs shadow-md">
             Out of Stock
           </span>
         ) : badgeText ? (
-          <span className="absolute top-4 left-4 chip !bg-brand !text-white !border-transparent backdrop-blur-md z-20 font-semibold shadow-glow">
-            <Sparkles size={12} /> {badgeText}
+          <span className="absolute top-3 sm:top-4 left-3 sm:left-4 chip !bg-brand !text-white !border-transparent backdrop-blur-md z-20 font-semibold text-[11px] sm:text-xs shadow-glow">
+            <Tag size={12} /> {badgeText}
           </span>
         ) : null}
 
         {/* TOP RIGHT ACTIONS (Zoom Lightbox & Auto-play) */}
-        <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+        <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1.5 sm:gap-2 z-20">
           {imageCount > 1 && (
             <button
               type="button"
               onClick={() => setIsAutoPlaying((prev) => !prev)}
               aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
               title={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
-              className={`h-9 w-9 rounded-full backdrop-blur-md border border-white/20 flex items-center justify-center transition-all ${
+              className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full backdrop-blur-md border border-white/20 flex items-center justify-center transition-all ${
                 isAutoPlaying
                   ? "bg-brand text-white shadow-glow"
-                  : "bg-black/40 hover:bg-black/70 text-white"
+                  : "bg-black/45 hover:bg-black/70 text-white"
               }`}
             >
-              {isAutoPlaying ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
+              {isAutoPlaying ? <Pause size={13} /> : <Play size={13} className="ml-0.5" />}
             </button>
           )}
 
@@ -182,15 +182,15 @@ export default function ProductGallerySlider({
             onClick={() => setIsLightboxOpen(true)}
             aria-label="Enlarge image"
             title="Expand fullscreen view"
-            className="h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all transform hover:scale-105"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-black/45 hover:bg-black/70 text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all transform hover:scale-105"
           >
-            <Maximize2 size={15} />
+            <Maximize2 size={14} />
           </button>
         </div>
 
         {/* FLOATING NAVIGATION ARROWS */}
         {imageCount > 1 && (
-          <div className="absolute inset-y-0 inset-x-3 flex items-center justify-between pointer-events-none z-20">
+          <div className="absolute inset-y-0 inset-x-2 sm:inset-x-3 flex items-center justify-between pointer-events-none z-20">
             <button
               type="button"
               onClick={(e) => {
@@ -198,9 +198,9 @@ export default function ProductGallerySlider({
                 paginate(-1);
               }}
               aria-label="Previous slide"
-              className="pointer-events-auto h-11 w-11 rounded-full bg-black/50 hover:bg-brand text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all transform hover:scale-110 shadow-xl opacity-90 group-hover:opacity-100"
+              className="pointer-events-auto h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-black/50 hover:bg-brand text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all transform active:scale-95 sm:hover:scale-110 shadow-lg opacity-85 sm:opacity-90 sm:group-hover:opacity-100"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
             <button
               type="button"
@@ -209,22 +209,22 @@ export default function ProductGallerySlider({
                 paginate(1);
               }}
               aria-label="Next slide"
-              className="pointer-events-auto h-11 w-11 rounded-full bg-black/50 hover:bg-brand text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all transform hover:scale-110 shadow-xl opacity-90 group-hover:opacity-100"
+              className="pointer-events-auto h-9 w-9 sm:h-11 sm:w-11 rounded-full bg-black/50 hover:bg-brand text-white backdrop-blur-md border border-white/15 flex items-center justify-center transition-all transform active:scale-95 sm:hover:scale-110 shadow-lg opacity-85 sm:opacity-90 sm:group-hover:opacity-100"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
           </div>
         )}
 
         {/* BOTTOM COUNTER & INDICATOR PILL */}
         {imageCount > 1 && (
-          <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-2 pointer-events-none z-20">
-            <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 pointer-events-auto shadow-lg">
-              <span className="text-white text-xs font-mono font-bold tracking-wider">
+          <div className="absolute bottom-3 sm:bottom-4 inset-x-0 flex items-center justify-center gap-2 pointer-events-none z-20">
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-black/60 backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/10 pointer-events-auto shadow-lg">
+              <span className="text-white text-[11px] sm:text-xs font-mono font-bold tracking-wider">
                 {currentIndex + 1} <span className="opacity-50">/</span> {imageCount}
               </span>
               <div className="h-2.5 w-[1px] bg-white/20" />
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {images.map((_, idx) => (
                   <button
                     key={idx}
@@ -233,7 +233,7 @@ export default function ProductGallerySlider({
                     aria-label={`Jump to slide ${idx + 1}`}
                     className={`transition-all duration-300 rounded-full ${
                       idx === currentIndex
-                        ? "w-5 h-1.5 bg-brand shadow-glow"
+                        ? "w-4 sm:w-5 h-1.5 bg-brand shadow-glow"
                         : "w-1.5 h-1.5 bg-white/50 hover:bg-white"
                     }`}
                   />
@@ -248,7 +248,7 @@ export default function ProductGallerySlider({
       {imageCount > 1 && (
         <div
           ref={thumbnailsRef}
-          className="flex items-center gap-3 overflow-x-auto py-2 px-1 no-scrollbar scroll-smooth"
+          className="flex items-center gap-2 sm:gap-3 overflow-x-auto py-1 px-0.5 no-scrollbar scroll-smooth"
         >
           {images.map((img, idx) => {
             const isActive = idx === currentIndex;
@@ -258,7 +258,7 @@ export default function ProductGallerySlider({
                 type="button"
                 onClick={() => jumpTo(idx)}
                 aria-label={`Select photo ${idx + 1}`}
-                className={`relative flex-shrink-0 h-20 w-20 rounded-2xl overflow-hidden transition-all duration-200 border-2 ${
+                className={`relative flex-shrink-0 h-16 w-16 sm:h-20 sm:w-20 rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-200 border-2 ${
                   isActive
                     ? "border-brand ring-2 ring-brand/40 scale-105 shadow-glow"
                     : "border-token opacity-70 hover:opacity-100 hover:border-brand/50"
@@ -285,35 +285,35 @@ export default function ProductGallerySlider({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-between p-4 md:p-8"
+            className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col items-center justify-between p-3 sm:p-6 md:p-8"
             onClick={() => setIsLightboxOpen(false)}
           >
             {/* Top Bar */}
             <div
-              className="w-full flex items-center justify-between text-white z-30"
+              className="w-full flex items-center justify-between text-white z-30 pb-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3">
-                <h4 className="font-display font-bold text-lg md:text-xl truncate max-w-md">
+              <div className="flex items-center gap-2.5 min-w-0 pr-2">
+                <h4 className="font-display font-bold text-base sm:text-xl truncate">
                   {product?.name || "Product Gallery"}
                 </h4>
-                <span className="chip !bg-white/10 !border-white/20 !text-white font-mono text-xs">
+                <span className="chip !bg-white/10 !border-white/20 !text-white font-mono text-xs shrink-0">
                   {currentIndex + 1} / {imageCount}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsLightboxOpen(false)}
-                className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition"
+                className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shrink-0"
                 aria-label="Close fullscreen"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             {/* Main Lightbox Stage */}
             <div
-              className="relative w-full max-w-5xl h-[70vh] flex items-center justify-center overflow-hidden my-auto"
+              className="relative w-full max-w-5xl h-[60vh] sm:h-[70vh] flex items-center justify-center overflow-hidden my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <AnimatePresence initial={false} custom={direction}>
@@ -328,12 +328,12 @@ export default function ProductGallerySlider({
                     x: { type: "spring", stiffness: 300, damping: 30 },
                     opacity: { duration: 0.25 },
                   }}
-                  className="w-full h-full flex items-center justify-center"
+                  className="w-full h-full flex items-center justify-center p-2"
                 >
                   <img
                     src={getResolvedImageUrl(images[currentIndex])}
                     alt={`${product?.name} fullscreen view ${currentIndex + 1}`}
-                    className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
+                    className="max-w-full max-h-full object-contain rounded-xl sm:rounded-2xl shadow-2xl"
                   />
                 </motion.div>
               </AnimatePresence>
@@ -347,10 +347,10 @@ export default function ProductGallerySlider({
                       e.stopPropagation();
                       paginate(-1);
                     }}
-                    className="absolute left-2 md:left-4 h-12 w-12 rounded-full bg-black/60 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all transform hover:scale-110 shadow-2xl"
+                    className="absolute left-1 sm:left-4 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-black/60 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all transform hover:scale-110 shadow-2xl"
                     aria-label="Previous"
                   >
-                    <ChevronLeft size={24} />
+                    <ChevronLeft size={22} />
                   </button>
                   <button
                     type="button"
@@ -358,10 +358,10 @@ export default function ProductGallerySlider({
                       e.stopPropagation();
                       paginate(1);
                     }}
-                    className="absolute right-2 md:right-4 h-12 w-12 rounded-full bg-black/60 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all transform hover:scale-110 shadow-2xl"
+                    className="absolute right-1 sm:right-4 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-black/60 hover:bg-brand text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all transform hover:scale-110 shadow-2xl"
                     aria-label="Next"
                   >
-                    <ChevronRight size={24} />
+                    <ChevronRight size={22} />
                   </button>
                 </>
               )}
@@ -378,7 +378,7 @@ export default function ProductGallerySlider({
                     key={idx}
                     type="button"
                     onClick={() => jumpTo(idx)}
-                    className={`h-14 w-14 rounded-xl overflow-hidden transition border-2 flex-shrink-0 ${
+                    className={`h-12 w-12 sm:h-14 sm:w-14 rounded-xl overflow-hidden transition border-2 flex-shrink-0 ${
                       idx === currentIndex
                         ? "border-brand scale-110 ring-2 ring-brand/50"
                         : "border-white/20 opacity-60 hover:opacity-100"

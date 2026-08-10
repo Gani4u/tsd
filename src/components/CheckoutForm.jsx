@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Shield, ArrowRight, CreditCard, Smartphone } from "lucide-react";
-import { api, formatINR, formatApiError } from "../lib/api";
+import { Shield, ArrowRight, CreditCard, Smartphone, Tag } from "lucide-react";
+import { api, formatINR, formatApiError, calculatePriceDetails } from "../lib/api";
 import ProductImage from "./ProductImage";
 
 const RZP_SRC = "https://checkout.razorpay.com/v1/checkout.js";
@@ -24,7 +24,6 @@ function loadRazorpay() {
 
 export default function CheckoutForm({ items, onSuccess }) {
   const [method, setMethod] = useState("cod"); // 'razorpay' | 'cod'
-  // 1. ADDED state FIELD HERE
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -39,6 +38,13 @@ export default function CheckoutForm({ items, onSuccess }) {
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const total = subtotal;
+
+  // Calculate MRP Total and Savings
+  const mrpTotal = items.reduce((sum, item) => {
+    const { mrp } = calculatePriceDetails(item.price);
+    return sum + mrp * item.quantity;
+  }, 0);
+  const totalSavings = Math.max(0, mrpTotal - total);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -113,21 +119,14 @@ export default function CheckoutForm({ items, onSuccess }) {
               });
               setBusy(false);
               onSuccess(verify.data.order_id);
-            }catch (err) {
-
+            } catch (err) {
               console.error("VERIFY ERROR", err);
-
-              console.log(err.response);
-
-              console.log(err.response?.data);
-
               setBusy(false);
-
               setErr(
-                  err.response?.data?.message ||
-                  "Payment verification failed"
+                err.response?.data?.message ||
+                "Payment verification failed"
               );
-          }
+            }
           },
         });
         rzp.open();
@@ -139,36 +138,36 @@ export default function CheckoutForm({ items, onSuccess }) {
   };
 
   return (
-    <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
-      <form onSubmit={submit} className="card p-6 space-y-6">
+    <div className="grid lg:grid-cols-[1fr_380px] gap-6 lg:gap-8 items-start">
+      <form onSubmit={submit} className="card p-4 sm:p-6 space-y-5 sm:space-y-6">
         <div>
-          <h2 className="font-display text-xl font-bold">Shipping Details</h2>
-          <p className="muted text-sm mt-1">Where should we drop your sound gear?</p>
+          <h2 className="font-display text-lg sm:text-xl font-bold">Shipping Details</h2>
+          <p className="muted text-xs sm:text-sm mt-1">Where should we deliver your sound gear?</p>
         </div>
 
         {/* Payment method selection */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <button
             type="button"
             onClick={() => setMethod("cod")}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${
+            className={`flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl border transition ${
               method === "cod" ? "border-brand bg-brand/5 text-current shadow-glow" : "border-token muted hover:text-current"
             }`}
           >
             <Smartphone size={20} className={method === "cod" ? "text-brand" : ""} />
             <span className="text-sm font-semibold mt-2">Cash on Delivery</span>
-            <span className="text-[10px] muted mt-1">Pay at delivery point</span>
+            <span className="text-[10px] muted mt-0.5">Pay upon delivery</span>
           </button>
           <button
             type="button"
             onClick={() => setMethod("razorpay")}
-            className={`flex flex-col items-center justify-center p-4 rounded-xl border transition ${
+            className={`flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-xl border transition ${
               method === "razorpay" ? "border-brand bg-brand/5 text-current shadow-glow" : "border-token muted hover:text-current"
             }`}
           >
             <CreditCard size={20} className={method === "razorpay" ? "text-brand" : ""} />
             <span className="text-sm font-semibold mt-2">Pay Online</span>
-            <span className="text-[10px] muted mt-1">UPI, Cards, Netbanking</span>
+            <span className="text-[10px] muted mt-0.5">UPI, Cards, Netbanking</span>
           </button>
         </div>
 
@@ -178,20 +177,20 @@ export default function CheckoutForm({ items, onSuccess }) {
             <input
               required
               data-testid="co-name"
-              className="input mt-2"
+              className="input mt-1.5"
               value={form.name}
               onChange={set("name")}
               placeholder="Aravind Kumar"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="label-caps muted">Email Address</label>
               <input
                 required
                 type="email"
                 data-testid="co-email"
-                className="input mt-2"
+                className="input mt-1.5"
                 value={form.email}
                 onChange={set("email")}
                 placeholder="you@gmail.com"
@@ -202,7 +201,7 @@ export default function CheckoutForm({ items, onSuccess }) {
               <input
                 required
                 data-testid="co-phone"
-                className="input mt-2"
+                className="input mt-1.5"
                 value={form.phone}
                 onChange={set("phone")}
                 inputMode="tel"
@@ -216,21 +215,20 @@ export default function CheckoutForm({ items, onSuccess }) {
               required
               rows={2}
               data-testid="co-address"
-              className="input mt-2"
+              className="input mt-1.5"
               value={form.address}
               onChange={set("address")}
               placeholder="House/Flat No, Apartment/Street, Landmark"
             />
           </div>
 
-          {/* 2. UPDATED LOCATION GRID TO INCLUDE STATE */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <div>
               <label className="label-caps muted">City</label>
               <input
                 required
                 data-testid="co-city"
-                className="input mt-2"
+                className="input mt-1.5"
                 value={form.city}
                 onChange={set("city")}
                 placeholder="Bengaluru"
@@ -241,7 +239,7 @@ export default function CheckoutForm({ items, onSuccess }) {
               <input
                 required
                 data-testid="co-state"
-                className="input mt-2"
+                className="input mt-1.5"
                 value={form.state}
                 onChange={set("state")}
                 placeholder="Karnataka"
@@ -252,7 +250,7 @@ export default function CheckoutForm({ items, onSuccess }) {
               <input
                 required
                 data-testid="co-pincode"
-                className="input mt-2"
+                className="input mt-1.5"
                 value={form.pincode}
                 onChange={set("pincode")}
                 inputMode="numeric"
@@ -268,7 +266,7 @@ export default function CheckoutForm({ items, onSuccess }) {
           type="submit"
           disabled={busy || items.length === 0}
           data-testid="checkout-pay-btn"
-          className="btn-primary w-full justify-center py-3 text-base"
+          className="btn-primary w-full justify-center py-3.5 text-base shadow-glow font-bold"
         >
           {busy
             ? (method === "razorpay" ? "Loading payment screen..." : "Booking order...")
@@ -279,38 +277,71 @@ export default function CheckoutForm({ items, onSuccess }) {
             )}
         </button>
 
-        <div className="flex items-center justify-center gap-2 text-xs muted">
-          <Shield size={14} className="text-brand" />
+        <div className="flex items-center justify-center gap-2 text-xs muted text-center">
+          <Shield size={14} className="text-brand shrink-0" />
           Secure checkout handled by direct TSD systems.
         </div>
       </form>
 
-      <aside className="card p-6 divide-y divider space-y-4">
+      {/* ORDER SUMMARY SIDEBAR */}
+      <aside className="card p-4 sm:p-6 divide-y divider space-y-4">
         <div>
-          <h3 className="font-display font-bold">Order Summary</h3>
+          <h3 className="font-display font-bold text-base sm:text-lg">Order Summary</h3>
           <p className="muted text-xs mt-0.5">{items.reduce((s, i) => s + i.quantity, 0)} items in bag</p>
         </div>
 
         <div className="pt-4 space-y-3 max-h-64 overflow-y-auto pr-1">
-          {items.map((i) => (
-            <div key={i.product_id} className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0">
-                <ProductImage src={i.image_url} name={i.name} />
+          {items.map((i) => {
+            const { mrp } = calculatePriceDetails(i.price);
+            return (
+              <div key={i.product_id} className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0">
+                  <ProductImage src={i.image_url} name={i.name} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">{i.name}</div>
+                  <div className="text-xs muted">Qty {i.quantity}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-sm font-semibold text-brand">{formatINR(i.price * i.quantity)}</div>
+                  {mrp > i.price && (
+                    <div className="text-[11px] muted line-through">{formatINR(mrp * i.quantity)}</div>
+                  )}
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold truncate">{i.name}</div>
-                <div className="text-xs muted">Qty {i.quantity}</div>
-              </div>
-              <div className="text-sm font-semibold">{formatINR(i.price * i.quantity)}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
+        {totalSavings > 0 && (
+          <div className="pt-3">
+            <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-3 py-2 rounded-xl font-bold">
+              <span className="flex items-center gap-1.5">
+                <Tag size={13} /> Festive Savings (30% OFF)
+              </span>
+              <span>- {formatINR(totalSavings)}</span>
+            </div>
+          </div>
+        )}
+
         <div className="pt-4 space-y-2 text-sm">
-          <div className="flex justify-between"><span className="muted">Subtotal</span><span>{formatINR(subtotal)}</span></div>
-          <div className="flex justify-between"><span className="muted">Shipping</span><span className="text-brand">Free</span></div>
+          <div className="flex justify-between text-xs muted">
+            <span>Total MRP</span>
+            <span className="line-through">{formatINR(mrpTotal)}</span>
+          </div>
+          {totalSavings > 0 && (
+            <div className="flex justify-between text-xs text-emerald-500 font-semibold">
+              <span>Instant Discount</span>
+              <span>- {formatINR(totalSavings)}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-xs">
+            <span className="muted">Delivery Fee</span>
+            <span className="text-brand font-semibold">FREE</span>
+          </div>
           <div className="flex justify-between font-display font-bold text-lg pt-2 border-t divider mt-2">
-            <span>Total</span><span>{formatINR(total)}</span>
+            <span>Total Payable</span>
+            <span className="text-brand">{formatINR(total)}</span>
           </div>
         </div>
       </aside>
