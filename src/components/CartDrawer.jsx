@@ -13,7 +13,7 @@ export default function CartDrawer() {
 
   // Calculate MRP Total and Savings
   const mrpTotal = items.reduce((sum, item) => {
-    const { mrp } = calculatePriceDetails(item.price);
+    const { mrp } = calculatePriceDetails(item);
     return sum + mrp * item.quantity;
   }, 0);
 
@@ -54,7 +54,7 @@ export default function CartDrawer() {
               </div>
             ) : (
               items.map((i) => {
-                const { mrp } = calculatePriceDetails(i.price);
+                const { mrp } = calculatePriceDetails(i);
                 return (
                   <div
                     key={i.product_id}
@@ -88,25 +88,29 @@ export default function CartDrawer() {
                           <Trash2 size={14} />
                         </button>
                       </div>
-
-                      <div className="mt-2 flex items-center gap-2">
-                        <button
-                          data-testid={`cart-dec-${i.product_id}`}
-                          onClick={() => setQty(i.product_id, i.quantity - 1)}
-                          className="h-7 w-7 rounded-full border border-token flex items-center justify-center hover:border-brand hover:text-brand transition"
-                        >
-                          <Minus size={12} />
-                        </button>
-                        <span className="text-sm font-semibold w-6 text-center">
-                          {i.quantity}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-2 border border-token rounded-lg p-1">
+                          <button
+                            data-testid={`cart-qty-minus-${i.product_id}`}
+                            onClick={() => setQty(i.product_id, i.quantity - 1)}
+                            className="h-6 w-6 rounded flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 text-xs"
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus size={12} />
+                          </button>
+                          <span className="text-xs font-bold w-4 text-center">{i.quantity}</span>
+                          <button
+                            data-testid={`cart-qty-plus-${i.product_id}`}
+                            onClick={() => setQty(i.product_id, i.quantity + 1)}
+                            className="h-6 w-6 rounded flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 text-xs"
+                            aria-label="Increase quantity"
+                          >
+                            <Plus size={12} />
+                          </button>
+                        </div>
+                        <span className="text-xs font-semibold">
+                          {formatINR(i.price * i.quantity)}
                         </span>
-                        <button
-                          data-testid={`cart-inc-${i.product_id}`}
-                          onClick={() => setQty(i.product_id, i.quantity + 1)}
-                          className="h-7 w-7 rounded-full border border-token flex items-center justify-center hover:border-brand hover:text-brand transition"
-                        >
-                          <Plus size={12} />
-                        </button>
                       </div>
                     </div>
                   </div>
@@ -120,7 +124,7 @@ export default function CartDrawer() {
               {totalSavings > 0 && (
                 <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-3 py-2 rounded-xl font-bold">
                   <span className="flex items-center gap-1.5">
-                    <Tag size={13} /> Festive Offer Applied (30% OFF)
+                    <Tag size={13} /> Special Offer Savings Applied
                   </span>
                   <span>- {formatINR(totalSavings)}</span>
                 </div>

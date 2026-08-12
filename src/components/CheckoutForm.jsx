@@ -41,7 +41,7 @@ export default function CheckoutForm({ items, onSuccess }) {
 
   // Calculate MRP Total and Savings
   const mrpTotal = items.reduce((sum, item) => {
-    const { mrp } = calculatePriceDetails(item.price);
+    const { mrp } = calculatePriceDetails(item);
     return sum + mrp * item.quantity;
   }, 0);
   const totalSavings = Math.max(0, mrpTotal - total);
@@ -292,7 +292,7 @@ export default function CheckoutForm({ items, onSuccess }) {
 
         <div className="pt-4 space-y-3 max-h-64 overflow-y-auto pr-1">
           {items.map((i) => {
-            const { mrp } = calculatePriceDetails(i.price);
+            const { mrp } = calculatePriceDetails(i);
             return (
               <div key={i.product_id} className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0">
@@ -317,7 +317,7 @@ export default function CheckoutForm({ items, onSuccess }) {
           <div className="pt-3">
             <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-3 py-2 rounded-xl font-bold">
               <span className="flex items-center gap-1.5">
-                <Tag size={13} /> Festive Savings (30% OFF)
+                <Tag size={13} /> Special Offer Savings Applied
               </span>
               <span>- {formatINR(totalSavings)}</span>
             </div>

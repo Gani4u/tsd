@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, Mail, Phone } from "lucide-react";
+import { Mail } from "lucide-react";
 
 const LOGO_URL = "https://customer-assets-agu9un31.emergentagent.net/job_tsd-electronics-mvp/artifacts/mg0oqn79_WhatsApp%20Image%202026-07-28%20at%2010.15.58%20PM.jpeg";
 
@@ -133,7 +133,7 @@ export default function Footer() {
             <span className="font-display font-black text-xl">TSD<span className="text-brand">.</span>World</span>
           </div>
           <p className="mt-4 muted max-w-md text-sm leading-relaxed">
-            Sound. Signal. Style. Premium audio & personal tech engineered in India — for the ones who move loud and live louder.
+            Sound. Signal. Style. Premium audio & personal tech engineered in India — for the ones who move loud and live louder.<br /> The World of trust service and durability
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:gap-3">
             <a
@@ -172,29 +172,19 @@ export default function Footer() {
         <div>
           <div className="label-caps muted mb-3 sm:mb-4">Explore</div>
           <ul className="space-y-2 text-sm">
-            <li className="muted hover:text-brand transition cursor-pointer">Earbuds</li>
-            <li className="muted hover:text-brand transition cursor-pointer">Headphones</li>
-            <li className="muted hover:text-brand transition cursor-pointer">Speakers</li>
-            <li className="muted hover:text-brand transition cursor-pointer">Smartwatches</li>
+            <li className="muted hover:text-brand transition cursor-pointer">Charging Cables</li>
+            <li className="muted hover:text-brand transition cursor-pointer">Adapters</li>
+            <li className="muted hover:text-brand transition cursor-pointer">TWS Earbuds</li>
+            <li className="muted hover:text-brand transition cursor-pointer">Wired Earphones</li>
           </ul>
         </div>
 
         <div>
           <div className="label-caps muted mb-3 sm:mb-4">Contact</div>
           <ul className="space-y-2.5 sm:space-y-3 text-sm">
-            <li className="flex items-start gap-2.5" data-testid="footer-address">
-              <MapPin size={14} className="text-brand mt-1 shrink-0" />
-              <span className="muted leading-relaxed text-xs sm:text-sm">
-                Near Huded Mahalaxmi temple,<br />Ilkal, Karnataka 587125
-              </span>
-            </li>
             <li className="flex items-center gap-2.5" data-testid="footer-email">
               <Mail size={14} className="text-brand shrink-0" />
-              <a href="mailto:info@tsdworld.in" className="muted hover:text-brand transition text-xs sm:text-sm truncate">info@tsdworld.in</a>
-            </li>
-            <li className="flex items-center gap-2.5" data-testid="footer-phone">
-              <Phone size={14} className="text-brand shrink-0" />
-              <a href="tel:+918660145698" className="muted hover:text-brand transition text-xs sm:text-sm truncate">+91 8660145698</a>
+              <a href="mailto:support@tsdworld.in" className="muted hover:text-brand transition text-xs sm:text-sm truncate">support@tsdworld.in</a>
             </li>
           </ul>
         </div>
@@ -202,7 +192,6 @@ export default function Footer() {
 
       <div className="container-x py-5 sm:py-6 border-t border-token flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs muted">
         <span>© {new Date().getFullYear()} TSD World™. Made in India.</span>
-        <span className="font-mono">v0.1 · MVP</span>
       </div>
     </footer>
   );

@@ -6,7 +6,7 @@ import { formatINR, calculatePriceDetails } from "../lib/api";
 
 export default function ProductCard({ product }) {
   const soon = product.stock <= 0;
-  const { price, mrp, discountPercent } = calculatePriceDetails(product.price);
+  const { price, mrp, discountPercent } = calculatePriceDetails(product);
 
   return (
     <Link
@@ -17,7 +17,7 @@ export default function ProductCard({ product }) {
       <div className="relative aspect-square overflow-hidden bg-black/5 dark:bg-white/5">
         <ProductCardSlider product={product} />
         
-        {/* 30% OFF Badge on Top Left */}
+        {/* Dynamic Discount OFF Badge on Top Left */}
         {discountPercent > 0 && !soon && (
           <span className="absolute top-2.5 left-2.5 chip !bg-emerald-500/90 !text-white !border-transparent text-[10px] font-bold z-20 shadow-md backdrop-blur-md">
             {discountPercent}% OFF
@@ -55,7 +55,7 @@ export default function ProductCard({ product }) {
             </span>
           ) : (
             <span className="text-emerald-500 text-[11px] font-bold">
-              Save 30%
+              Save {discountPercent}%
             </span>
           )}
         </div>

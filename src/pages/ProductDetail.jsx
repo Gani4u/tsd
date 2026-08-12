@@ -73,7 +73,7 @@ export default function ProductDetail() {
   }
 
   const disabled = product.stock <= 0;
-  const { price, mrp, savings, discountPercent } = calculatePriceDetails(product.price);
+  const { price, mrp, savings, discountPercent } = calculatePriceDetails(product);
 
   const addToCart = () => cart.add(product, 1);
   const startBuyNow = () => {

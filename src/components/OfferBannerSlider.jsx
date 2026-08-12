@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, ArrowRight, Tag, ShieldCheck, Flame, Zap, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Tag, ShieldCheck, Flame, Zap, Headphones } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BANNERS = [
@@ -10,11 +10,11 @@ const BANNERS = [
     tagIcon: Tag,
     tagColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     title: "Freedom to Vibe.",
-    titleHighlight: "Special 30% Savings.",
+    titleHighlight: "Special upto 50% Savings.",
     description:
-      "Celebrate India's Independence Day with uncompromised sound. Enjoy flat 30% savings applied directly on checkout with free all-India express delivery.",
+      "Celebrate India's Independence Day with uncompromised sound. Enjoy flat upto 50% savings applied directly on checkout with free all-India express delivery.",
     badge: "Limited Festive Offer",
-    priceTag: "Flat 30% Off",
+    priceTag: "Flat upto 50% Off",
     ctaText: "Shop Independence Drop",
     ctaLink: "/shop",
     gradient:
@@ -28,46 +28,48 @@ const BANNERS = [
     title: "Silence the Noise.",
     titleHighlight: "Feel Every Beat.",
     description:
-      "TSD Pulse Pro ANC with Hybrid 50mm Neodymium Drivers, 50-Hour monster battery life, and 0.05s ultra-low latency gaming mode.",
-    badge: "Save ₹4,000 Today",
-    priceTag: "₹ 4,999",
-    strikePrice: "₹ 8,999 (44% OFF)",
-    ctaText: "Explore Pulse Pro",
+      "TWS Earbuds with ENC, 50-Hour monster battery life, and ultra-low latency in gaming mode.",
+    badge: "Save ₹700 Today",
+    priceTag: "₹ 799",
+    strikePrice: "₹ 1,499 (47% OFF)",
+    ctaText: "Explore TWS Earbuds",
     ctaLink: "/shop",
     gradient:
       "radial-gradient(circle at 85% 15%, rgba(255, 69, 0, 0.4), transparent 45%), radial-gradient(circle at 15% 85%, rgba(147, 51, 234, 0.35), transparent 50%), linear-gradient(135deg, #090a0f 0%, #161524 100%)",
   },
   {
-    id: "basswave-ultra",
-    tag: "Flash Weekend Deal",
+    id: "hypercharge-power",
+    tag: "⚡ Ultra-Fast Power Drop",
     tagIcon: Zap,
-    tagColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-    title: "IPX7 Waterproof.",
-    titleHighlight: "60Hr Beast Battery.",
+    tagColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    title: "80W Cables & 65W Adapters.",
+    titleHighlight: "Flat 40% Off Fast Power.",
     description:
-      "Engineered for workouts & rains. Quad-mic ENC noise cancellation with instant fast charge — 10 mins charge gives 10 hours of loud sound.",
-    badge: "Instant 30% Off",
-    priceTag: "Save 30% Now",
-    ctaText: "Shop Earbuds Range",
+      "Superfast 80W / 65W braided Type-C cables and 65W Dual Port QC+PD fast chargers. Braided durability, zero overheating & lightning-fast speeds.",
+    badge: "Save 40% Today",
+    priceTag: "Starting ₹ 169",
+    strikePrice: "₹ 282 (40% OFF)",
+    ctaText: "Shop Cables & Adapters",
     ctaLink: "/shop",
     gradient:
-      "radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.4), transparent 45%), radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.35), transparent 50%), linear-gradient(135deg, #070e17 0%, #0d1a2d 100%)",
+      "radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.45), transparent 45%), radial-gradient(circle at 20% 80%, rgba(234, 179, 8, 0.35), transparent 50%), linear-gradient(135deg, #100b05 0%, #1a1207 100%)",
   },
   {
-    id: "titan-smartwatch",
-    tag: "New Ecosystem Arrival",
-    tagIcon: CheckCircle2,
-    tagColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    title: "Signal Meets Style.",
-    titleHighlight: "Free Premium Strap.",
+    id: "wired-studio-earphones",
+    tag: "🎧 Studio HD Audio Drop",
+    tagIcon: Headphones,
+    tagColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    title: "Zero Latency. Pure Bass.",
+    titleHighlight: "Flat 30% Off Wired Series.",
     description:
-      "Ultra HD AMOLED display with Bluetooth calling, live health sensors, and seamless 1-tap audio sync with all TSD earbuds & headphones.",
-    badge: "Made in India",
-    priceTag: "Flat 30% Savings",
-    ctaText: "Check Collection",
+      "Type-C & 3.5mm wired earphones with high-definition acoustics, crystal-clear mic, metallic chamber, and tangle-free braided cables.",
+    badge: "Save 30% Today",
+    priceTag: "Starting ₹ 149",
+    strikePrice: "₹ 213 (30% OFF)",
+    ctaText: "Shop Wired Earphones",
     ctaLink: "/shop",
     gradient:
-      "radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.4), transparent 45%), radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.35), transparent 50%), linear-gradient(135deg, #06120d 0%, #101e18 100%)",
+      "radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.45), transparent 45%), radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.35), transparent 50%), linear-gradient(135deg, #070d17 0%, #0d1a2d 100%)",
   },
 ];
 
