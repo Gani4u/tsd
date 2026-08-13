@@ -29,9 +29,9 @@ const BANNERS = [
     titleHighlight: "Feel Every Beat.",
     description:
       "TWS Earbuds with ENC, 50-Hour monster battery life, and ultra-low latency in gaming mode.",
-    badge: "Save ₹700 Today",
-    priceTag: "₹ 799",
-    strikePrice: "₹ 1,499 (47% OFF)",
+    badge: "Save ₹699 Today",
+    priceTag: "₹ 699",
+    strikePrice: "₹ 1,398 (50% OFF)",
     ctaText: "Explore TWS Earbuds",
     ctaLink: "/shop",
     gradient:

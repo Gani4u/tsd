@@ -11,7 +11,7 @@ export const formatINR = (n) =>
 /**
  * Determines discount percentage based on product category/name
  * - Cables & Chargers/Adapters: 40% OFF
- * - TWS Earbuds: 47% OFF (e.g. ₹799 vs MRP ₹1,499)
+ * - TWS Earbuds: 50% OFF (e.g. ₹699 vs MRP ₹1,398)
  * - Wired Earphones: 30% OFF
  * - Default: 30% OFF
  */
@@ -24,7 +24,7 @@ export function getProductDiscountPercent(productOrItem) {
   const category = String(productOrItem.category || "").toLowerCase();
   const desc = String(productOrItem.description || "").toLowerCase();
 
-  // TWS Earbuds / Wireless Earbuds (47% OFF, e.g. ₹799 vs ₹1499)
+  // TWS Earbuds / Wireless Earbuds (50% OFF, e.g. ₹699 vs ₹1398)
   if (
     name.includes("earbud") ||
     name.includes("tws") ||
@@ -32,7 +32,7 @@ export function getProductDiscountPercent(productOrItem) {
     category.includes("earbud") ||
     category.includes("tws")
   ) {
-    return 47;
+    return 50;
   }
 
   // Chargers / Adapters (40% OFF)
@@ -93,8 +93,8 @@ export function calculatePriceDetails(priceOrProduct, maybeProduct = null) {
   const ratio = (100 - discountPercent) / 100;
   
   let mrp = Math.round(sellingPrice / ratio);
-  if (discountPercent === 47 && sellingPrice === 799) {
-    mrp = 1499;
+  if (discountPercent === 50 && sellingPrice === 699) {
+    mrp = 1398;
   }
 
   const savings = Math.max(0, mrp - sellingPrice);

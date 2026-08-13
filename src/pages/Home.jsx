@@ -104,7 +104,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="chip !bg-white/15 !border-white/30 !text-white backdrop-blur-md font-mono text-sm sm:text-base font-extrabold shrink-0 shadow-md">
-                  {formatINR(earbudProduct?.price || 799)}
+                  {formatINR(earbudProduct?.price || 699)}
                 </div>
               </div>
             </Link>
