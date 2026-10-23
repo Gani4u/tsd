@@ -154,7 +154,7 @@ export default function ProductGallerySlider({
             Out of Stock
           </span>
         ) : badgeText ? (
-          <span className="absolute top-3 sm:top-4 left-3 sm:left-4 chip !bg-brand !text-white !border-transparent backdrop-blur-md z-20 font-semibold text-[11px] sm:text-xs shadow-glow">
+          <span className="absolute top-3 sm:top-4 left-3 sm:left-4 chip !bg-brand !text-brand-fg !border-transparent backdrop-blur-md z-20 font-bold text-[11px] sm:text-xs shadow-glow">
             <Tag size={12} /> {badgeText}
           </span>
         ) : null}
@@ -169,7 +169,7 @@ export default function ProductGallerySlider({
               title={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
               className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full backdrop-blur-md border border-white/20 flex items-center justify-center transition-all ${
                 isAutoPlaying
-                  ? "bg-brand text-white shadow-glow"
+                  ? "bg-brand text-brand-fg shadow-glow font-bold"
                   : "bg-black/45 hover:bg-black/70 text-white"
               }`}
             >

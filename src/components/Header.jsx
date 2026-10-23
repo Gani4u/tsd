@@ -84,12 +84,12 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 glass-header">
-      <div className="container-x flex items-center justify-between h-16">
+    <header className="sticky top-0 z-40 glass-header transition-colors duration-200">
+      <div className="container-x flex items-center justify-between h-16 sm:h-18">
         {/* Logo */}
         <Link
           to="/"
-          className="flex items-center gap-2.5 group shrink-0"
+          className="flex items-center gap-3 group shrink-0"
           data-testid="logo-link"
           onClick={() => {
             setMobileMenuOpen(false);
@@ -98,26 +98,28 @@ export default function Header() {
             }
           }}
         >
-          <span className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl overflow-hidden bg-white shadow-glow">
-            <img src={LOGO_URL} alt="TSD World" className="h-full w-full object-contain scale-110" />
+          <span className="relative inline-flex items-center justify-center h-10 w-10 rounded-xl overflow-hidden bg-white p-1 shadow-card border border-token">
+            <img src={LOGO_URL} alt="TSD World" className="h-full w-full object-contain" />
           </span>
-          <span className="font-display font-black text-xl tracking-tight">
-            TSD<span className="text-brand">.</span>World
+          <span className="font-display font-extrabold text-xl tracking-tight flex items-center">
+            <span>TSD</span>
+            <span className="text-brand">.</span>
+            <span className="font-semibold text-foreground/90">World</span>
           </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1 text-sm">
+        <nav className="hidden md:flex items-center gap-1.5 text-sm p-1 rounded-full surface border border-token">
           {navItems.map((item) => (
             <Link
               key={item.id}
               to={item.to}
               onClick={item.onClick}
               data-testid={`nav-${item.id}`}
-              className={`px-4 py-2 rounded-full transition font-semibold ${
+              className={`px-4 py-1.5 rounded-full transition-all duration-200 font-semibold text-xs sm:text-sm ${
                 item.isActive
-                  ? "bg-brand text-white shadow-glow"
-                  : "hover:bg-black/5 dark:hover:bg-white/5 text-current"
+                  ? "bg-brand text-brand-fg shadow-glow font-bold"
+                  : "hover:bg-black/5 dark:hover:bg-white/5 text-current muted hover:text-current"
               }`}
             >
               {item.label}
@@ -126,26 +128,27 @@ export default function Header() {
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <button
             aria-label="Toggle theme"
             data-testid="theme-toggle-btn"
             onClick={toggle}
-            className="h-10 w-10 rounded-full border border-token flex items-center justify-center transition hover:bg-black/5 dark:hover:bg-white/5"
+            className="h-10 w-10 rounded-full border border-token surface flex items-center justify-center transition-all duration-200 hover:border-brand/50 hover:text-brand"
+            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
           >
-            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            {theme === "dark" ? <Sun size={17} className="text-amber-400" /> : <Moon size={17} className="text-slate-700" />}
           </button>
 
           <button
             aria-label="Open cart"
             data-testid="cart-open-btn"
             onClick={() => setOpen(true)}
-            className="relative h-10 w-10 rounded-full border border-token flex items-center justify-center transition hover:bg-black/5 dark:hover:bg-white/5"
+            className="relative h-10 w-10 rounded-full border border-token surface flex items-center justify-center transition-all duration-200 hover:border-brand/50 hover:text-brand"
           >
-            <ShoppingBag size={16} />
+            <ShoppingBag size={17} />
             {count > 0 && (
               <span
-                className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-brand text-white text-[10px] font-bold flex items-center justify-center shadow-glow"
+                className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full bg-brand text-brand-fg text-[10px] font-extrabold flex items-center justify-center shadow-glow animate-pulse-glow"
                 data-testid="cart-count"
               >
                 {count}
@@ -158,7 +161,7 @@ export default function Header() {
             type="button"
             aria-label="Toggle navigation menu"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="md:hidden h-10 w-10 rounded-full border border-token flex items-center justify-center transition hover:bg-black/5 dark:hover:bg-white/5"
+            className="md:hidden h-10 w-10 rounded-full border border-token surface flex items-center justify-center transition hover:border-brand/50"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -176,7 +179,7 @@ export default function Header() {
                 onClick={item.onClick}
                 className={`flex items-center justify-between px-4 py-3 rounded-xl font-semibold transition ${
                   item.isActive
-                    ? "bg-brand text-white shadow-glow"
+                    ? "bg-brand text-brand-fg shadow-glow font-bold"
                     : "hover:bg-black/5 dark:hover:bg-white/5"
                 }`}
               >

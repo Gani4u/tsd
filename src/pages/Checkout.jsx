@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, ArrowLeft } from "lucide-react";
+import { ShoppingBag, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import CheckoutForm from "../components/CheckoutForm";
 
@@ -16,14 +16,14 @@ export default function Checkout() {
   if (confirmed) {
     return (
       <div className="container-x py-12 sm:py-24 flex items-center justify-center" data-testid="order-success">
-        <div className="card p-6 sm:p-8 max-w-md w-full text-center shadow-card">
-          <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/15 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FF4500" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
+        <div className="card p-6 sm:p-10 max-w-md w-full text-center shadow-card">
+          <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/10 border border-brand/20 text-brand flex items-center justify-center">
+            <CheckCircle2 size={32} />
           </div>
-          <h3 className="mt-4 font-display text-xl sm:text-2xl font-bold">Order placed successfully!</h3>
-          <p className="muted mt-2 text-xs sm:text-sm">We've received your order. We'll send your invoice and delivery tracking details shortly.</p>
+          <h3 className="mt-5 font-display text-xl sm:text-2xl font-bold">Order placed successfully!</h3>
+          <p className="muted mt-2 text-xs sm:text-sm leading-relaxed">
+            We've received your order. We'll send your invoice and delivery tracking details shortly.
+          </p>
           <div className="mt-4 chip font-mono text-xs">#{confirmed}</div>
           <Link to="/shop" className="btn-primary w-full justify-center mt-6 shadow-glow" data-testid="order-success-close">
             Continue shopping
@@ -36,7 +36,7 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="container-x py-16 sm:py-24 text-center">
-        <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/15 flex items-center justify-center">
+        <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/10 border border-brand/20 flex items-center justify-center">
           <ShoppingBag className="text-brand" />
         </div>
         <h2 className="mt-4 font-display text-xl sm:text-2xl font-bold">Your bag is empty.</h2>

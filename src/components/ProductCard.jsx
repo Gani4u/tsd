@@ -12,45 +12,47 @@ export default function ProductCard({ product }) {
     <Link
       to={`/product/${product.id}`}
       data-testid={`product-card-${product.id}`}
-      className="group relative flex flex-col rounded-2xl border border-token surface overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
+      className="group relative flex flex-col rounded-2xl border border-token surface overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-card"
     >
       <div className="relative aspect-square overflow-hidden bg-black/5 dark:bg-white/5">
         <ProductCardSlider product={product} />
-        
+
         {/* Dynamic Discount OFF Badge on Top Left */}
         {discountPercent > 0 && !soon && (
-          <span className="absolute top-2.5 left-2.5 chip !bg-emerald-500/90 !text-white !border-transparent text-[10px] font-bold z-20 shadow-md backdrop-blur-md">
+          <span className="absolute top-2.5 left-2.5 chip !bg-emerald-500 !text-white !border-transparent text-[10px] font-extrabold z-20 shadow-md">
             {discountPercent}% OFF
           </span>
         )}
 
-        <span className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 shadow-md pointer-events-none">
-          <ArrowUpRight size={16} />
+        <span className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/90 dark:bg-black/80 text-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-20 shadow-md backdrop-blur-md">
+          <ArrowUpRight size={15} />
         </span>
       </div>
 
       <div className="p-4 sm:p-5 flex flex-col justify-between flex-1">
         <div>
-          <h3 className="font-bold text-lg sm:text-xl line-clamp-1">{product.name}</h3>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1.5 line-clamp-2">
+          <h3 className="font-bold text-base sm:text-lg line-clamp-1 group-hover:text-brand transition-colors">
+            {product.name}
+          </h3>
+          <p className="text-xs sm:text-sm muted mt-1.5 line-clamp-2 leading-relaxed">
             {product.description || product.tagline}
           </p>
         </div>
 
-        <div className="mt-4 flex items-baseline justify-between gap-2 flex-wrap">
+        <div className="mt-4 pt-3 border-t border-token flex items-baseline justify-between gap-2 flex-wrap">
           <div className="flex items-baseline gap-2">
-            <span className="text-brand font-bold text-lg sm:text-xl">
+            <span className="text-brand font-extrabold text-lg sm:text-xl font-mono">
               {formatINR(price)}
             </span>
             {mrp > price && (
-              <span className="text-xs muted line-through font-medium">
+              <span className="text-xs muted line-through font-medium font-mono">
                 {formatINR(mrp)}
               </span>
             )}
           </div>
 
           {soon ? (
-            <span className="text-red-500 text-[11px] font-semibold chip !bg-red-500/10 !border-red-500/30">
+            <span className="text-red-400 text-[11px] font-semibold chip !bg-red-500/10 !border-red-500/20">
               Out of Stock
             </span>
           ) : (

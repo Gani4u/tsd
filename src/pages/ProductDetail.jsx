@@ -14,7 +14,6 @@ export default function ProductDetail() {
   const cart = useCart();
 
   useEffect(() => {
-    // Reset scroll to top immediately when ID changes
     try {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     } catch {
@@ -33,7 +32,6 @@ export default function ProductDetail() {
         setNotFound(true);
       } finally {
         setLoading(false);
-        // Ensure scroll top after product state updates
         setTimeout(() => {
           try {
             window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -92,7 +90,7 @@ export default function ProductDetail() {
       </Link>
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-        {/* PRODUCT GALLERY WITH SMOOTH SLIDING TRANSITION */}
+        {/* PRODUCT GALLERY */}
         <div data-testid="product-hero-image" className="w-full max-w-full">
           <ProductGallerySlider product={product} disabled={disabled} />
         </div>
@@ -110,14 +108,14 @@ export default function ProductDetail() {
           <div className="mt-4 sm:mt-6 flex flex-col gap-2">
             <div className="flex items-baseline gap-3 flex-wrap">
               <span
-                className="font-display text-4xl sm:text-5xl font-black text-brand"
+                className="font-display text-4xl sm:text-5xl font-extrabold text-brand font-mono"
                 data-testid="product-price"
               >
                 {formatINR(price)}
               </span>
 
               {mrp > price && (
-                <span className="font-display text-xl sm:text-2xl muted line-through font-semibold">
+                <span className="font-display text-xl sm:text-2xl muted line-through font-semibold font-mono">
                   {formatINR(mrp)}
                 </span>
               )}
@@ -136,7 +134,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="text-xs muted font-medium">
-              Inclusive of all taxes · Free express shipping across India
+              Inclusive of all taxes · Free express delivery across India
             </div>
           </div>
 
@@ -174,7 +172,7 @@ export default function ProductDetail() {
 
           {product.description && (
             <div className="mt-8 sm:mt-10 pt-6 border-t border-token">
-              <h3 className="font-display font-bold text-lg sm:text-xl">Overview</h3>
+              <h3 className="font-display font-bold text-lg sm:text-xl">Product Overview</h3>
               <p className="mt-3 muted whitespace-pre-line text-sm sm:text-base leading-relaxed">
                 {product.description}
               </p>

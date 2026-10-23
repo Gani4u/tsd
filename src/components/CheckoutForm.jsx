@@ -100,7 +100,7 @@ export default function CheckoutForm({ items, onSuccess }) {
             email: form.email,
             contact: form.phone,
           },
-          theme: { color: "#FF4500" },
+          theme: { color: "#00DFD8" },
           modal: {
             ondismiss: () => {
               setErr("Payment cancelled by user");

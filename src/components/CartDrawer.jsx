@@ -46,7 +46,7 @@ export default function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-5 space-y-4">
             {items.length === 0 ? (
               <div className="text-center py-16">
-                <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/15 flex items-center justify-center">
+                <div className="mx-auto h-14 w-14 rounded-2xl bg-brand/10 border border-brand/20 text-brand flex items-center justify-center">
                   <ShoppingBag className="text-brand" />
                 </div>
                 <h4 className="mt-4 font-display text-xl font-bold">Nothing in here yet.</h4>
@@ -137,7 +137,7 @@ export default function CartDrawer() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="muted text-sm">Final Amount</span>
-                  <span className="font-display text-2xl font-bold text-brand">{formatINR(subtotal)}</span>
+                  <span className="font-mono text-2xl font-bold text-brand">{formatINR(subtotal)}</span>
                 </div>
               </div>
 

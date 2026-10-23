@@ -1,5 +1,6 @@
 import React from "react";
-import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Mail, ShieldCheck, Truck } from "lucide-react";
 
 const LOGO_URL = "https://customer-assets-agu9un31.emergentagent.net/job_tsd-electronics-mvp/artifacts/mg0oqn79_WhatsApp%20Image%202026-07-28%20at%2010.15.58%20PM.jpeg";
 
@@ -123,75 +124,101 @@ function JioMartLogo({ className = "h-5 w-auto" }) {
 
 export default function Footer() {
   return (
-    <footer className="mt-14 sm:mt-24 border-t border-token">
-      <div className="container-x py-10 sm:py-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+    <footer className="mt-16 sm:mt-24 border-t border-token surface-subtle">
+      <div className="container-x py-12 sm:py-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
         <div className="sm:col-span-2">
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl overflow-hidden bg-white">
-              <img src={LOGO_URL} alt="TSD World" className="h-full w-full object-contain scale-110" />
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl overflow-hidden bg-white p-1 border border-token shadow-card">
+              <img src={LOGO_URL} alt="TSD World" className="h-full w-full object-contain" />
             </span>
-            <span className="font-display font-black text-xl">TSD<span className="text-brand">.</span>World</span>
+            <span className="font-display font-extrabold text-xl tracking-tight">
+              TSD<span className="text-brand">.</span>World
+            </span>
           </div>
           <p className="mt-4 muted max-w-md text-sm leading-relaxed">
-            Sound. Signal. Style. Premium audio & personal tech engineered in India — for the ones who move loud and live louder.<br /> The World of trust service and durability
+            Sound. Signal. Style. Engineered audio & personal electronics designed with uncompromising fidelity.
+            <br />
+            <strong className="text-foreground/80">The World of Trust, Service and Durability.</strong>
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:gap-3">
-            <a
-              href="https://www.amazon.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="platform-amazon"
-              className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand/60 hover:shadow-md hover:scale-105 transition-all duration-200"
-              title="Amazon"
-            >
-              <AmazonLogo className="h-4 sm:h-5 w-auto" />
-            </a>
-            <a
-              href="https://www.flipkart.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="platform-flipkart"
-              className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand/60 hover:shadow-md hover:scale-105 transition-all duration-200"
-              title="Flipkart"
-            >
-              <FlipkartLogo className="h-4 sm:h-5 w-auto" />
-            </a>
-            <a
-              href="https://www.jiomart.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="platform-jiomart"
-              className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand/60 hover:shadow-md hover:scale-105 transition-all duration-200"
-              title="JioMart"
-            >
-              <JioMartLogo className="h-4 sm:h-5 w-auto" />
-            </a>
+          <div className="mt-6">
+            <div className="label-caps muted mb-2 text-[10px]">Official Retail Platforms</div>
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <a
+                href="https://www.amazon.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="platform-amazon"
+                className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand hover:scale-105 transition-all duration-200"
+                title="Amazon"
+              >
+                <AmazonLogo className="h-4 sm:h-5 w-auto" />
+              </a>
+              <a
+                href="https://www.flipkart.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="platform-flipkart"
+                className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand hover:scale-105 transition-all duration-200"
+                title="Flipkart"
+              >
+                <FlipkartLogo className="h-4 sm:h-5 w-auto" />
+              </a>
+              <a
+                href="https://www.jiomart.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="platform-jiomart"
+                className="h-10 px-3.5 sm:px-4 rounded-xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-center hover:border-brand hover:scale-105 transition-all duration-200"
+                title="JioMart"
+              >
+                <JioMartLogo className="h-4 sm:h-5 w-auto" />
+              </a>
+            </div>
           </div>
         </div>
 
         <div>
-          <div className="label-caps muted mb-3 sm:mb-4">Explore</div>
-          <ul className="space-y-2 text-sm">
-            <li className="muted hover:text-brand transition cursor-pointer">Charging Cables</li>
-            <li className="muted hover:text-brand transition cursor-pointer">Adapters</li>
-            <li className="muted hover:text-brand transition cursor-pointer">TWS Earbuds</li>
-            <li className="muted hover:text-brand transition cursor-pointer">Wired Earphones</li>
+          <div className="label-caps muted mb-3 sm:mb-4">Explore Audio</div>
+          <ul className="space-y-2.5 text-sm">
+            <li>
+              <Link to="/shop" className="muted hover:text-brand transition">TWS Earbuds</Link>
+            </li>
+            <li>
+              <Link to="/shop" className="muted hover:text-brand transition">Wired Earphones</Link>
+            </li>
+            <li>
+              <Link to="/shop" className="muted hover:text-brand transition">Fast Charging Cables</Link>
+            </li>
+            <li>
+              <Link to="/shop" className="muted hover:text-brand transition">Power Adapters</Link>
+            </li>
           </ul>
         </div>
 
         <div>
-          <div className="label-caps muted mb-3 sm:mb-4">Contact</div>
-          <ul className="space-y-2.5 sm:space-y-3 text-sm">
+          <div className="label-caps muted mb-3 sm:mb-4">Direct Contact</div>
+          <ul className="space-y-3 text-sm">
             <li className="flex items-center gap-2.5" data-testid="footer-email">
-              <Mail size={14} className="text-brand shrink-0" />
-              <a href="mailto:support@tsdworld.in" className="muted hover:text-brand transition text-xs sm:text-sm truncate">support@tsdworld.in</a>
+              <Mail size={15} className="text-brand shrink-0" />
+              <a href="mailto:support@tsdworld.in" className="muted hover:text-brand transition text-xs sm:text-sm truncate">
+                support@tsdworld.in
+              </a>
+            </li>
+            <li className="flex items-center gap-2 text-xs muted">
+              <ShieldCheck size={14} className="text-emerald-500 shrink-0" />
+              <span>1-Year National Warranty</span>
+            </li>
+            <li className="flex items-center gap-2 text-xs muted">
+              <Truck size={14} className="text-sky-500 shrink-0" />
+              <span>Pan-India Express Dispatch</span>
             </li>
           </ul>
         </div>
       </div>
 
       <div className="container-x py-5 sm:py-6 border-t border-token flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs muted">
-        <span>© {new Date().getFullYear()} TSD World™. Made in India.</span>
+        <span>© {new Date().getFullYear()} TSD World™. Engineered in Karnataka, India.</span>
+        <span>Sound · Signal · Style</span>
       </div>
     </footer>
   );

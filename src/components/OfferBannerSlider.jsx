@@ -1,47 +1,31 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, ArrowRight, Tag, ShieldCheck, Flame, Zap, Headphones } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, Tag, ShieldCheck, Zap, Headphones, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BANNERS = [
   {
-    id: "august-15-freedom",
-    tag: "🇮🇳 August 15 Independence Special",
-    tagIcon: Tag,
-    tagColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    title: "Freedom to Vibe.",
-    titleHighlight: "Special upto 50% Savings.",
-    description:
-      "Celebrate India's Independence Day with uncompromised sound. Enjoy flat upto 50% savings applied directly on checkout with free all-India express delivery.",
-    badge: "Limited Festive Offer",
-    priceTag: "Flat upto 50% Off",
-    ctaText: "Shop Independence Drop",
-    ctaLink: "/shop",
-    gradient:
-      "radial-gradient(circle at 10% 20%, rgba(255, 107, 0, 0.45), transparent 45%), radial-gradient(circle at 90% 80%, rgba(34, 197, 94, 0.35), transparent 50%), linear-gradient(135deg, #0b0c10 0%, #151720 100%)",
-  },
-  {
-    id: "pulse-pro-anc",
+    id: "flagship-tws-drop",
     tag: "Studio Flagship Drop",
-    tagIcon: Flame,
-    tagColor: "bg-brand/20 text-brand border-brand/30",
+    tagIcon: Sparkles,
+    tagColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
     title: "Silence the Noise.",
-    titleHighlight: "Feel Every Beat.",
+    titleHighlight: "Feel Every Frequency.",
     description:
-      "TWS Earbuds with ENC, 50-Hour monster battery life, and ultra-low latency in gaming mode.",
+      "TSD Tune Pods ANC with 45-Hour monster battery, Bluetooth 5.3 low-latency, acoustic driver cutaway, and 4 custom studio colorways.",
     badge: "Save ₹699 Today",
     priceTag: "₹ 699",
     strikePrice: "₹ 1,398 (50% OFF)",
     ctaText: "Explore TWS Earbuds",
     ctaLink: "/shop",
     gradient:
-      "radial-gradient(circle at 85% 15%, rgba(255, 69, 0, 0.4), transparent 45%), radial-gradient(circle at 15% 85%, rgba(147, 51, 234, 0.35), transparent 50%), linear-gradient(135deg, #090a0f 0%, #161524 100%)",
+      "radial-gradient(circle at 85% 15%, rgba(0, 223, 216, 0.35), transparent 45%), radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.30), transparent 50%), linear-gradient(135deg, #090D16 0%, #111A2E 100%)",
   },
   {
     id: "hypercharge-power",
-    tag: "⚡ Ultra-Fast Power Drop",
+    tag: "Ultra-Fast Power Drop",
     tagIcon: Zap,
-    tagColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    tagColor: "bg-amber-500/20 text-amber-300 border-amber-500/30",
     title: "80W Cables & 65W Adapters.",
     titleHighlight: "Flat 40% Off Fast Power.",
     description:
@@ -52,13 +36,13 @@ const BANNERS = [
     ctaText: "Shop Cables & Adapters",
     ctaLink: "/shop",
     gradient:
-      "radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.45), transparent 45%), radial-gradient(circle at 20% 80%, rgba(234, 179, 8, 0.35), transparent 50%), linear-gradient(135deg, #100b05 0%, #1a1207 100%)",
+      "radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.35), transparent 45%), radial-gradient(circle at 20% 80%, rgba(2, 132, 199, 0.25), transparent 50%), linear-gradient(135deg, #0D1117 0%, #171E2B 100%)",
   },
   {
     id: "wired-studio-earphones",
-    tag: "🎧 Studio HD Audio Drop",
+    tag: "Studio HD Audio Drop",
     tagIcon: Headphones,
-    tagColor: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    tagColor: "bg-teal-500/20 text-teal-300 border-teal-500/30",
     title: "Zero Latency. Pure Bass.",
     titleHighlight: "Flat 30% Off Wired Series.",
     description:
@@ -69,7 +53,23 @@ const BANNERS = [
     ctaText: "Shop Wired Earphones",
     ctaLink: "/shop",
     gradient:
-      "radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.45), transparent 45%), radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.35), transparent 50%), linear-gradient(135deg, #070d17 0%, #0d1a2d 100%)",
+      "radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.35), transparent 45%), radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.25), transparent 50%), linear-gradient(135deg, #070F1B 0%, #101B2E 100%)",
+  },
+  {
+    id: "august-15-freedom",
+    tag: "Exclusive Special Offer",
+    tagIcon: Tag,
+    tagColor: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+    title: "Freedom to Vibe.",
+    titleHighlight: "Upto 50% Savings Across Range.",
+    description:
+      "Celebrate uncompromising sound. Enjoy flat upto 50% savings applied directly on checkout with free all-India express delivery.",
+    badge: "Limited Season Offer",
+    priceTag: "Upto 50% Off",
+    ctaText: "Shop Featured Range",
+    ctaLink: "/shop",
+    gradient:
+      "radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.35), transparent 45%), radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.25), transparent 50%), linear-gradient(135deg, #0B111E 0%, #162035 100%)",
   },
 ];
 
@@ -99,9 +99,12 @@ export default function OfferBannerSlider() {
   const currentIndex = ((page % bannerCount) + bannerCount) % bannerCount;
   const currentBanner = BANNERS[currentIndex];
 
-  const paginate = useCallback((newDirection) => {
-    setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
-  }, []);
+  const paginate = useCallback(
+    (newDirection) => {
+      setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
+    },
+    []
+  );
 
   const jumpTo = (index) => {
     const diff = index - currentIndex;
@@ -110,53 +113,29 @@ export default function OfferBannerSlider() {
     }
   };
 
-  // Auto slide every 5.5 seconds
+  // Auto-scroll every 6 seconds if not hovered
   useEffect(() => {
     if (isHovered) return;
     const timer = setInterval(() => {
       paginate(1);
-    }, 5500);
+    }, 6000);
     return () => clearInterval(timer);
   }, [isHovered, paginate]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowLeft") paginate(-1);
+      if (e.key === "ArrowRight") paginate(1);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [paginate]);
 
   const TagIcon = currentBanner.tagIcon;
 
   return (
-    <section
-      id="featured"
-      className="container-x py-6 sm:py-10"
-      aria-label="Offers and Featured Drops"
-    >
-      <div className="flex items-end justify-between mb-4 sm:mb-6">
-        <div>
-          <div className="label-caps text-brand flex items-center gap-1.5">
-            <Tag size={12} /> Exclusive Offers & Drops
-          </div>
-          <h2 className="font-display font-extrabold text-2xl sm:text-4xl tracking-tight mt-1">
-            Featured Specials.
-          </h2>
-        </div>
-        <div className="hidden sm:flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => paginate(-1)}
-            aria-label="Previous banner"
-            className="h-9 w-9 rounded-full border border-token flex items-center justify-center hover:border-brand hover:text-brand transition"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => paginate(1)}
-            aria-label="Next banner"
-            className="h-9 w-9 rounded-full border border-token flex items-center justify-center hover:border-brand hover:text-brand transition"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* BANNER STAGE - Spacious height so buttons never get cut off */}
+    <section className="container-x py-6 md:py-10" aria-label="Special Offers">
       <div
         className="relative overflow-hidden rounded-3xl border border-token shadow-2xl min-h-[460px] sm:min-h-[440px] md:min-h-[420px] lg:min-h-[400px] select-none"
         onMouseEnter={() => setIsHovered(true)}
@@ -200,7 +179,7 @@ export default function OfferBannerSlider() {
                 <span className="chip !bg-white/10 !border-white/20 !text-white backdrop-blur-md font-mono text-xs font-bold">
                   {currentBanner.badge}
                 </span>
-                <span className="chip !bg-brand !border-transparent !text-white backdrop-blur-md font-bold text-xs shadow-glow">
+                <span className="chip !bg-brand !border-transparent !text-brand-fg backdrop-blur-md font-bold text-xs shadow-glow">
                   {currentBanner.priceTag}
                 </span>
               </div>
@@ -208,7 +187,7 @@ export default function OfferBannerSlider() {
 
             {/* MAIN CONTENT */}
             <div className="relative z-10 my-2 sm:my-auto max-w-2xl">
-              <h3 className="font-display font-black text-2xl sm:text-4xl md:text-5xl text-white tracking-tight leading-[1.08]">
+              <h3 className="font-display font-extrabold text-2xl sm:text-4xl md:text-5xl text-white tracking-tight leading-[1.08]">
                 {currentBanner.title}{" "}
                 <span className="text-brand block sm:inline">{currentBanner.titleHighlight}</span>
               </h3>
@@ -241,43 +220,42 @@ export default function OfferBannerSlider() {
           </motion.div>
         </AnimatePresence>
 
-        {/* FLOATING PREV/NEXT BUTTONS */}
-        <div className="absolute inset-y-0 inset-x-2 sm:inset-x-4 flex items-center justify-between pointer-events-none z-20">
+        {/* LEFT / RIGHT CONTROLS */}
+        <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
           <button
             type="button"
+            aria-label="Previous Offer Slide"
             onClick={() => paginate(-1)}
-            aria-label="Previous slide"
-            className="pointer-events-auto h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-black/55 hover:bg-brand text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all transform active:scale-95 sm:hover:scale-110 shadow-lg"
+            className="h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition active:scale-95"
           >
             <ChevronLeft size={18} />
           </button>
           <button
             type="button"
+            aria-label="Next Offer Slide"
             onClick={() => paginate(1)}
-            aria-label="Next slide"
-            className="pointer-events-auto h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-black/55 hover:bg-brand text-white backdrop-blur-md border border-white/20 flex items-center justify-center transition-all transform active:scale-95 sm:hover:scale-110 shadow-lg"
+            className="h-9 w-9 rounded-full bg-black/40 hover:bg-black/70 text-white border border-white/20 backdrop-blur-md flex items-center justify-center transition active:scale-95"
           >
             <ChevronRight size={18} />
           </button>
         </div>
 
-        {/* BOTTOM PAGINATION INDICATOR PILLS */}
-        <div className="absolute bottom-2.5 sm:bottom-3 left-0 right-0 flex items-center justify-center gap-2 z-20 pointer-events-none">
-          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 pointer-events-auto shadow-md">
-            {BANNERS.map((b, idx) => (
+        {/* DOTS INDICATOR */}
+        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+          {BANNERS.map((banner, index) => {
+            const isActive = index === currentIndex;
+            return (
               <button
-                key={b.id}
+                key={banner.id}
                 type="button"
-                onClick={() => jumpTo(idx)}
-                aria-label={`Jump to slide ${idx + 1}`}
-                className={`transition-all duration-300 rounded-full ${
-                  idx === currentIndex
-                    ? "w-5 sm:w-7 h-1.5 sm:h-2 bg-brand shadow-glow"
-                    : "w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white"
+                aria-label={`Jump to slide ${index + 1}`}
+                onClick={() => jumpTo(index)}
+                className={`transition-all duration-300 rounded-full h-1.5 ${
+                  isActive ? "w-8 bg-brand" : "w-2 bg-white/40 hover:bg-white/70"
                 }`}
               />
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const HUES = ["#FF4500", "#7C3AED", "#0EA5E9", "#22C55E", "#F59E0B", "#EC4899"];
+const HUES = ["#00DFD8", "#6366F1", "#0EA5E9", "#10B981", "#F59E0B", "#EC4899"];
 
 function hash(str = "") {
   let h = 0;
@@ -59,7 +59,6 @@ export function getProductGallery(product) {
 
   // Check product.images array
   if (Array.isArray(product.images)) {
-    // If objects have sort_order, sort them
     const sortedImages = [...product.images].sort((a, b) => {
       const orderA = typeof a === "object" && a?.sort_order !== undefined ? Number(a.sort_order) : 0;
       const orderB = typeof b === "object" && b?.sort_order !== undefined ? Number(b.sort_order) : 0;
@@ -78,6 +77,12 @@ export function getProductGallery(product) {
   if (product.image) add(product.image);
   if (product.image_url) add(product.image_url);
 
+  // If this is the earbud product and has no images or few images, provide the official poster asset
+  const name = String(product.name || "").toLowerCase();
+  if ((name.includes("earbud") || name.includes("tws") || String(product.id) === "22") && gallery.length === 0) {
+    add("/hero-earbuds.jpg");
+  }
+
   return gallery;
 }
 
@@ -92,6 +97,20 @@ export default function ProductImage({ src, name = "TSD", className = "", alt, o
         alt={alt || name}
         loading="lazy"
         onError={() => setLoadError(true)}
+        onClick={onClick}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${className}`}
+      />
+    );
+  }
+
+  // Fallback for earbud product if image load fails
+  const lowerName = String(name || "").toLowerCase();
+  if (lowerName.includes("earbud") || lowerName.includes("tws")) {
+    return (
+      <img
+        src="/hero-earbuds.jpg"
+        alt={alt || name}
+        loading="lazy"
         onClick={onClick}
         className={`w-full h-full object-cover transition-opacity duration-300 ${className}`}
       />
@@ -116,17 +135,17 @@ export default function ProductImage({ src, name = "TSD", className = "", alt, o
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(circle at 25% 20%, ${hue}55, transparent 55%), radial-gradient(circle at 75% 80%, #FF450055, transparent 55%), linear-gradient(135deg, #0b0b0f, #1a1a22)`,
+          background: `radial-gradient(circle at 25% 20%, ${hue}40, transparent 55%), radial-gradient(circle at 75% 80%, rgba(0, 223, 216, 0.25), transparent 55%), linear-gradient(135deg, #090D16, #141B2D)`,
         }}
       />
-      <div className="absolute inset-0 grain opacity-40" />
+      <div className="absolute inset-0 grain opacity-30" />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 text-center">
-        <div className="font-display text-[48px] md:text-[60px] leading-none font-black tracking-tight opacity-90">
+        <div className="font-display text-[44px] md:text-[54px] leading-none font-extrabold tracking-tight opacity-90">
           {initials}
         </div>
-        <div className="mt-2 label-caps opacity-70">TSD World</div>
+        <div className="mt-2 label-caps text-brand opacity-90">TSD World</div>
       </div>
-      <div className="absolute bottom-3 right-3 font-mono text-[10px] text-white/50">TSD Audio</div>
+      <div className="absolute bottom-3 right-3 font-mono text-[10px] text-white/40">TSD Audio</div>
     </div>
   );
 }
