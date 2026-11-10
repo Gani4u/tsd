@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ShieldCheck, Truck, RefreshCcw, ShoppingBag, Zap, Tag } from "lucide-react";
-import { getProductById, formatINR, calculatePriceDetails } from "../lib/api";
+import { ArrowLeft, ShieldCheck, Truck, RefreshCcw, ShoppingBag, Zap, Tag, Sparkles, CheckCircle2 } from "lucide-react";
+import { getProductById, formatINR, calculatePriceDetails, isValidCoupon } from "../lib/api";
 import ProductGallerySlider from "../components/ProductGallerySlider";
 import { useCart } from "../context/CartContext";
 
@@ -11,6 +11,9 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMsg, setCouponMsg] = useState({ text: "", type: "" });
   const cart = useCart();
 
   useEffect(() => {
@@ -27,6 +30,12 @@ export default function ProductDetail() {
         const prod = await getProductById(id);
         if (!prod) throw new Error("Product not found");
         setProduct(prod);
+
+        // Sync if this item was already in cart with coupon applied
+        const inCart = cart?.items?.find((i) => String(i.product_id) === String(prod.id));
+        if (inCart && inCart.couponApplied) {
+          setCouponApplied(true);
+        }
       } catch (err) {
         console.error("Failed to load product", err);
         setNotFound(true);
@@ -41,7 +50,7 @@ export default function ProductDetail() {
         }, 10);
       }
     })();
-  }, [id]);
+  }, [id, cart?.items]);
 
   if (loading) {
     return (
@@ -71,11 +80,40 @@ export default function ProductDetail() {
   }
 
   const disabled = product.stock <= 0;
-  const { price, mrp, savings, discountPercent } = calculatePriceDetails(product);
+  const {
+    price,
+    regularPrice,
+    mrp,
+    savings,
+    couponSavings,
+    categoryDiscountPercent,
+  } = calculatePriceDetails(product, null, couponApplied);
 
-  const addToCart = () => cart.add(product, 1);
+  const handleApplyCoupon = (codeOverride) => {
+    const code = (codeOverride || couponInput || "").trim().toUpperCase();
+    if (isValidCoupon(code)) {
+      setCouponApplied(true);
+      setCouponMsg({
+        text: `20% OFF applied! You save ₹${couponSavings || (regularPrice - (product.price || 0))}.`,
+        type: "success",
+      });
+    } else {
+      setCouponMsg({
+        text: "Coupon not applicable",
+        type: "error",
+      });
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponApplied(false);
+    setCouponInput("");
+    setCouponMsg({ text: "", type: "" });
+  };
+
+  const addToCart = () => cart.add(product, 1, couponApplied);
   const startBuyNow = () => {
-    cart.add(product, 1);
+    cart.add(product, 1, couponApplied);
     navigate("/checkout");
   };
 
@@ -114,16 +152,40 @@ export default function ProductDetail() {
                 {formatINR(price)}
               </span>
 
-              {mrp > price && (
-                <span className="font-display text-xl sm:text-2xl muted line-through font-semibold font-mono">
-                  {formatINR(mrp)}
-                </span>
-              )}
+              {couponApplied ? (
+                <>
+                  <span
+                    className="font-display text-lg sm:text-xl muted line-through font-medium font-mono"
+                    title="Regular price without coupon"
+                  >
+                    {formatINR(regularPrice)}
+                  </span>
+                  {mrp > regularPrice && (
+                    <span
+                      className="font-display text-xs sm:text-sm muted line-through font-mono opacity-60"
+                      title="MRP"
+                    >
+                      MRP {formatINR(mrp)}
+                    </span>
+                  )}
+                  <span className="chip !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-500 font-bold text-xs sm:text-sm py-1 px-3">
+                    <Sparkles size={12} /> 20% OFF Applied · Saved {formatINR(couponSavings)}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {mrp > price && (
+                    <span className="font-display text-xl sm:text-2xl muted line-through font-semibold font-mono" title="MRP">
+                      {formatINR(mrp)}
+                    </span>
+                  )}
 
-              {discountPercent > 0 && !disabled && (
-                <span className="chip !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-500 font-bold text-xs sm:text-sm py-1 px-3">
-                  <Tag size={12} /> Save ₹{savings} ({discountPercent}% OFF)
-                </span>
+                  {categoryDiscountPercent > 0 && !disabled && (
+                    <span className="chip !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-500 font-bold text-xs sm:text-sm py-1 px-3">
+                      <Tag size={12} /> Save ₹{savings} ({categoryDiscountPercent}% OFF)
+                    </span>
+                  )}
+                </>
               )}
 
               {disabled && (
@@ -137,6 +199,74 @@ export default function ProductDetail() {
               Inclusive of all taxes · Free express delivery across India
             </div>
           </div>
+
+          {/* COUPON CODE BOX */}
+          {!disabled && (
+            <div className="mt-5 p-4 rounded-2xl border border-dashed border-token surface-subtle">
+              {couponApplied ? (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-3 text-emerald-500">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CheckCircle2 size={16} className="shrink-0" />
+                    <div className="text-xs sm:text-sm">
+                      <span className="font-bold">20% OFF coupon applied!</span> You saved{" "}
+                      <span className="font-bold">{formatINR(couponSavings)}</span> on this product.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-xs font-semibold underline text-foreground/70 hover:text-red-400 shrink-0 transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <div className="h-7 w-7 rounded-lg bg-brand/10 border border-brand/20 text-brand flex items-center justify-center shrink-0">
+                      <Tag size={14} />
+                    </div>
+                    <span className="text-xs sm:text-sm font-bold">Have a coupon code?</span>
+                  </div>
+
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleApplyCoupon();
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value);
+                        if (couponMsg.text) setCouponMsg({ text: "", type: "" });
+                      }}
+                      placeholder="Enter coupon code"
+                      className="input flex-1 uppercase font-mono tracking-wider text-xs sm:text-sm py-2 px-3"
+                    />
+                    <button
+                      type="submit"
+                      className="btn-primary py-2 px-4 text-xs sm:text-sm font-bold shrink-0"
+                    >
+                      Apply
+                    </button>
+                  </form>
+
+                  {couponMsg.text && (
+                    <p
+                      className={`text-xs mt-2 flex items-center gap-1 ${
+                        couponMsg.type === "error" ? "text-red-400 font-medium" : "text-emerald-500 font-semibold"
+                      }`}
+                    >
+                      {couponMsg.text}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 w-full">
             <button

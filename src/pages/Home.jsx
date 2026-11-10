@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Cpu, Bolt, ShieldCheck, Flame, MapPin, Mail, Volume2, BatteryCharging, Radio } from "lucide-react";
-import { getProducts, formatINR } from "../lib/api";
+import { getProducts, formatINR, calculatePriceDetails } from "../lib/api";
 import ProductCard from "../components/ProductCard";
 import OfferBannerSlider from "../components/OfferBannerSlider";
 
@@ -33,6 +33,8 @@ export default function Home() {
         p.name?.toLowerCase().includes("wireless") ||
         p.name?.toLowerCase().includes("tws")
     ) || null;
+
+  const earbudPricing = calculatePriceDetails(earbudProduct || { price: 699, name: "TSD Tune Pods ANC" });
 
   // 4 products in one line for handpicked
   const featuredList = products.slice(0, 4);
@@ -128,7 +130,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="chip !bg-white/15 !border-white/30 !text-white backdrop-blur-md font-mono text-sm sm:text-base font-extrabold shrink-0 shadow-md">
-                  {formatINR(earbudProduct?.price || 699)}
+                  {formatINR(earbudPricing.price)}
                 </div>
               </div>
             </Link>

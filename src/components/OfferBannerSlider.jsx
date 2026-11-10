@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, ArrowRight, Tag, ShieldCheck, Zap, Headphones, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowRight, ShieldCheck, Zap, Headphones, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BANNERS = [
@@ -13,9 +13,9 @@ const BANNERS = [
     titleHighlight: "Feel Every Frequency.",
     description:
       "TSD Tune Pods ANC with 45-Hour monster battery, Bluetooth 5.3 low-latency, acoustic driver cutaway, and 4 custom studio colorways.",
-    badge: "Save ₹699 Today",
-    priceTag: "₹ 699",
-    strikePrice: "₹ 1,398 (50% OFF)",
+    badge: "Save 50% Today",
+    priceTag: "₹ 874",
+    strikePrice: "₹ 1,748 (50% OFF)",
     ctaText: "Explore TWS Earbuds",
     ctaLink: "/shop",
     gradient:
@@ -31,8 +31,8 @@ const BANNERS = [
     description:
       "Superfast 80W / 65W braided Type-C cables and 65W Dual Port QC+PD fast chargers. Braided durability, zero overheating & lightning-fast speeds.",
     badge: "Save 40% Today",
-    priceTag: "Starting ₹ 169",
-    strikePrice: "₹ 282 (40% OFF)",
+    priceTag: "Starting ₹ 211",
+    strikePrice: "₹ 352 (40% OFF)",
     ctaText: "Shop Cables & Adapters",
     ctaLink: "/shop",
     gradient:
@@ -48,29 +48,29 @@ const BANNERS = [
     description:
       "Type-C & 3.5mm wired earphones with high-definition acoustics, crystal-clear mic, metallic chamber, and tangle-free braided cables.",
     badge: "Save 30% Today",
-    priceTag: "Starting ₹ 149",
-    strikePrice: "₹ 213 (30% OFF)",
+    priceTag: "Starting ₹ 186",
+    strikePrice: "₹ 266 (30% OFF)",
     ctaText: "Shop Wired Earphones",
     ctaLink: "/shop",
     gradient:
       "radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.35), transparent 45%), radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.25), transparent 50%), linear-gradient(135deg, #070F1B 0%, #101B2E 100%)",
   },
-  {
-    id: "august-15-freedom",
-    tag: "Exclusive Special Offer",
-    tagIcon: Tag,
-    tagColor: "bg-sky-500/20 text-sky-300 border-sky-500/30",
-    title: "Freedom to Vibe.",
-    titleHighlight: "Upto 50% Savings Across Range.",
-    description:
-      "Celebrate uncompromising sound. Enjoy flat upto 50% savings applied directly on checkout with free all-India express delivery.",
-    badge: "Limited Season Offer",
-    priceTag: "Upto 50% Off",
-    ctaText: "Shop Featured Range",
-    ctaLink: "/shop",
-    gradient:
-      "radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.35), transparent 45%), radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.25), transparent 50%), linear-gradient(135deg, #0B111E 0%, #162035 100%)",
-  },
+  // {
+  //   id: "august-15-freedom",
+  //   tag: "Exclusive Special Offer",
+  //   tagIcon: Tag,
+  //   tagColor: "bg-sky-500/20 text-sky-300 border-sky-500/30",
+  //   title: "Freedom to Vibe.",
+  //   titleHighlight: "Upto 50% Savings Across Range.",
+  //   description:
+  //     "Celebrate uncompromising sound. Enjoy flat upto 50% savings applied directly on checkout with free all-India express delivery.",
+  //   badge: "Limited Season Offer",
+  //   priceTag: "Upto 50% Off",
+  //   ctaText: "Shop Featured Range",
+  //   ctaLink: "/shop",
+  //   gradient:
+  //     "radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.35), transparent 45%), radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.25), transparent 50%), linear-gradient(135deg, #0B111E 0%, #162035 100%)",
+  // },
 ];
 
 const bannerVariants = {

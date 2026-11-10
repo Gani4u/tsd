@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Shield, ArrowRight, CreditCard, Smartphone, Tag } from "lucide-react";
+import { Shield, ArrowRight, CreditCard, Smartphone, Tag, Sparkles } from "lucide-react";
 import { api, formatINR, formatApiError, calculatePriceDetails } from "../lib/api";
 import ProductImage from "./ProductImage";
+import { useCart } from "../context/CartContext";
 
 const RZP_SRC = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -35,16 +36,43 @@ export default function CheckoutForm({ items, onSuccess }) {
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [couponInput, setCouponInput] = useState("");
+  const [couponMsg, setCouponMsg] = useState("");
+  const { removeCouponFromItem, applyCouponToAll } = useCart() || {};
 
   const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const total = subtotal;
 
   // Calculate MRP Total and Savings
   const mrpTotal = items.reduce((sum, item) => {
-    const { mrp } = calculatePriceDetails(item);
-    return sum + mrp * item.quantity;
+    const details = calculatePriceDetails(item, null, Boolean(item.couponApplied));
+    return sum + (item.mrp || details.mrp) * item.quantity;
   }, 0);
+
+  const couponSavingsTotal = items.reduce((sum, item) => {
+    if (!item.couponApplied) return sum;
+    const reg = item.regularPrice || calculatePriceDetails(item).regularPrice;
+    const db = item.dbPrice !== undefined ? item.dbPrice : item.price;
+    return sum + Math.max(0, reg - db) * item.quantity;
+  }, 0);
+
   const totalSavings = Math.max(0, mrpTotal - total);
+
+  const handleApplyAllCoupons = (e) => {
+    e.preventDefault();
+    if (!couponInput.trim()) return;
+    if (applyCouponToAll) {
+      const res = applyCouponToAll(couponInput);
+      if (!res.success) {
+        setCouponMsg(res.message);
+      } else {
+        setCouponMsg("");
+        setCouponInput("");
+      }
+    }
+  };
+
+  const hasAnyWithoutCoupon = items.some((i) => !i.couponApplied);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
@@ -290,22 +318,45 @@ export default function CheckoutForm({ items, onSuccess }) {
           <p className="muted text-xs mt-0.5">{items.reduce((s, i) => s + i.quantity, 0)} items in bag</p>
         </div>
 
-        <div className="pt-4 space-y-3 max-h-64 overflow-y-auto pr-1">
+        <div className="pt-4 space-y-3 max-h-72 overflow-y-auto pr-1">
           {items.map((i) => {
-            const { mrp } = calculatePriceDetails(i);
+            const details = calculatePriceDetails(i, null, Boolean(i.couponApplied));
+            const itemMrp = i.mrp || details.mrp;
+            const regPrice = i.regularPrice || details.regularPrice;
+
             return (
-              <div key={i.product_id} className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0">
+              <div key={i.product_id} className="flex items-start gap-3 p-2 rounded-xl border border-token/60 surface-subtle">
+                <div className="h-12 w-12 rounded-lg overflow-hidden border border-token shrink-0 mt-0.5">
                   <ProductImage src={i.image_url} name={i.name} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold truncate">{i.name}</div>
                   <div className="text-xs muted">Qty {i.quantity}</div>
+                  {i.couponApplied && (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="chip !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-500 text-[10px] font-extrabold py-0 px-1.5">
+                        <Sparkles size={9} /> 20% OFF Applied
+                      </span>
+                      {removeCouponFromItem && (
+                        <button
+                          type="button"
+                          onClick={() => removeCouponFromItem(i.product_id)}
+                          className="text-[10px] muted hover:text-red-400 underline"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-sm font-semibold text-brand">{formatINR(i.price * i.quantity)}</div>
-                  {mrp > i.price && (
-                    <div className="text-[11px] muted line-through">{formatINR(mrp * i.quantity)}</div>
+                  <div className="text-sm font-semibold text-brand font-mono">{formatINR(i.price * i.quantity)}</div>
+                  {i.couponApplied ? (
+                    <div className="text-[11px] muted line-through font-mono">{formatINR(regPrice * i.quantity)}</div>
+                  ) : (
+                    itemMrp > i.price && (
+                      <div className="text-[11px] muted line-through font-mono">{formatINR(itemMrp * i.quantity)}</div>
+                    )
                   )}
                 </div>
               </div>
@@ -313,13 +364,45 @@ export default function CheckoutForm({ items, onSuccess }) {
           })}
         </div>
 
+        {/* Global coupon input in checkout */}
+        {hasAnyWithoutCoupon && (
+          <div className="pt-3">
+            <div className="p-3 rounded-xl border border-dashed border-token surface-subtle space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold flex items-center gap-1.5">
+                  <Tag size={12} className="text-brand" /> Have a coupon code?
+                </span>
+              </div>
+              <form onSubmit={handleApplyAllCoupons} className="flex gap-1.5">
+                <input
+                  type="text"
+                  value={couponInput}
+                  onChange={(e) => {
+                    setCouponInput(e.target.value);
+                    if (couponMsg) setCouponMsg("");
+                  }}
+                  placeholder="Enter coupon code"
+                  className="input flex-1 uppercase font-mono tracking-wider text-xs py-1 px-2.5"
+                />
+                <button
+                  type="submit"
+                  className="btn-primary py-1 px-3 text-xs font-bold shrink-0"
+                >
+                  Apply
+                </button>
+              </form>
+              {couponMsg && <p className="text-[11px] text-red-400 font-medium">{couponMsg}</p>}
+            </div>
+          </div>
+        )}
+
         {totalSavings > 0 && (
           <div className="pt-3">
             <div className="flex items-center justify-between text-xs bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-3 py-2 rounded-xl font-bold">
               <span className="flex items-center gap-1.5">
                 <Tag size={13} /> Special Offer Savings Applied
               </span>
-              <span>- {formatINR(totalSavings)}</span>
+              <span className="font-mono">- {formatINR(totalSavings)}</span>
             </div>
           </div>
         )}
@@ -327,12 +410,20 @@ export default function CheckoutForm({ items, onSuccess }) {
         <div className="pt-4 space-y-2 text-sm">
           <div className="flex justify-between text-xs muted">
             <span>Total MRP</span>
-            <span className="line-through">{formatINR(mrpTotal)}</span>
+            <span className="line-through font-mono">{formatINR(mrpTotal)}</span>
           </div>
-          {totalSavings > 0 && (
+          {totalSavings - couponSavingsTotal > 0 && (
             <div className="flex justify-between text-xs text-emerald-500 font-semibold">
               <span>Instant Discount</span>
-              <span>- {formatINR(totalSavings)}</span>
+              <span className="font-mono">- {formatINR(totalSavings - couponSavingsTotal)}</span>
+            </div>
+          )}
+          {couponSavingsTotal > 0 && (
+            <div className="flex justify-between text-xs text-emerald-500 font-semibold">
+              <span className="flex items-center gap-1">
+                <Sparkles size={11} /> Coupon Discount (20% OFF)
+              </span>
+              <span className="font-mono">- {formatINR(couponSavingsTotal)}</span>
             </div>
           )}
           <div className="flex justify-between text-xs">
@@ -341,7 +432,7 @@ export default function CheckoutForm({ items, onSuccess }) {
           </div>
           <div className="flex justify-between font-display font-bold text-lg pt-2 border-t divider mt-2">
             <span>Total Payable</span>
-            <span className="text-brand">{formatINR(total)}</span>
+            <span className="text-brand font-mono">{formatINR(total)}</span>
           </div>
         </div>
       </aside>

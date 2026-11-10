@@ -1,23 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Trash2, Minus, Plus, ShoppingBag, ArrowRight, Tag } from "lucide-react";
+import { X, Trash2, Minus, Plus, ShoppingBag, ArrowRight, Tag, Sparkles } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { formatINR, calculatePriceDetails } from "../lib/api";
 import ProductImage from "./ProductImage";
 
 export default function CartDrawer() {
-  const { items, open, setOpen, remove, setQty, clear, subtotal, count } = useCart();
+  const {
+    items,
+    open,
+    setOpen,
+    remove,
+    setQty,
+    clear,
+    subtotal,
+    count,
+    mrpTotal,
+    totalSavings,
+    couponSavingsTotal,
+    removeCouponFromItem,
+    applyCouponToAll,
+  } = useCart();
   const navigate = useNavigate();
+  const [bagCouponInput, setBagCouponInput] = useState("");
+  const [bagCouponMsg, setBagCouponMsg] = useState("");
 
   if (!open) return null;
 
-  // Calculate MRP Total and Savings
-  const mrpTotal = items.reduce((sum, item) => {
-    const { mrp } = calculatePriceDetails(item);
-    return sum + mrp * item.quantity;
-  }, 0);
+  const handleApplyBagCoupon = (e) => {
+    e.preventDefault();
+    if (!bagCouponInput.trim()) return;
+    const res = applyCouponToAll(bagCouponInput);
+    if (!res.success) {
+      setBagCouponMsg(res.message);
+    } else {
+      setBagCouponMsg("");
+      setBagCouponInput("");
+    }
+  };
 
-  const totalSavings = Math.max(0, mrpTotal - subtotal);
+  const hasAnyItemWithoutCoupon = items.some((i) => !i.couponApplied);
 
   return (
     <>
@@ -54,11 +76,14 @@ export default function CartDrawer() {
               </div>
             ) : (
               items.map((i) => {
-                const { mrp } = calculatePriceDetails(i);
+                const details = calculatePriceDetails(i, null, Boolean(i.couponApplied));
+                const itemMrp = i.mrp || details.mrp;
+                const regularPrice = i.regularPrice || details.regularPrice;
+
                 return (
                   <div
                     key={i.product_id}
-                    className="flex gap-3 p-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition"
+                    className="flex gap-3 p-3 rounded-2xl border border-token surface-subtle hover:border-brand/30 transition"
                     data-testid={`cart-line-${i.product_id}`}
                   >
                     <div className="h-20 w-20 rounded-xl overflow-hidden border border-token shrink-0">
@@ -66,19 +91,42 @@ export default function CartDrawer() {
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <div className="text-sm font-semibold line-clamp-1">{i.name}</div>
-                          <div className="flex items-baseline gap-2 mt-1">
-                            <span className="text-brand font-bold text-sm">
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold truncate">{i.name}</div>
+                          <div className="flex items-baseline gap-2 mt-1 flex-wrap">
+                            <span className="text-brand font-bold text-sm font-mono">
                               {formatINR(i.price)}
                             </span>
-                            {mrp > i.price && (
-                              <span className="text-xs muted line-through font-medium">
-                                {formatINR(mrp)}
+                            {i.couponApplied ? (
+                              <span className="text-xs muted line-through font-mono" title="Price without coupon">
+                                {formatINR(regularPrice)}
                               </span>
+                            ) : (
+                              itemMrp > i.price && (
+                                <span className="text-xs muted line-through font-mono">
+                                  {formatINR(itemMrp)}
+                                </span>
+                              )
                             )}
                           </div>
+
+                          {/* Applied Coupon Badge */}
+                          {i.couponApplied && (
+                            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                              <span className="chip !bg-emerald-500/15 !border-emerald-500/30 !text-emerald-500 text-[10px] font-bold py-0.5 px-2">
+                                <Sparkles size={10} /> 20% OFF Applied
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeCouponFromItem(i.product_id)}
+                                className="text-[10px] muted hover:text-red-400 underline transition"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          )}
                         </div>
+
                         <button
                           data-testid={`cart-remove-${i.product_id}`}
                           onClick={() => remove(i.product_id)}
@@ -88,8 +136,9 @@ export default function CartDrawer() {
                           <Trash2 size={14} />
                         </button>
                       </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-2 border border-token rounded-lg p-1">
+
+                      <div className="flex items-center justify-between mt-2 pt-2 border-t border-token/50">
+                        <div className="flex items-center gap-2 border border-token rounded-lg p-1 bg-surface">
                           <button
                             data-testid={`cart-qty-minus-${i.product_id}`}
                             onClick={() => setQty(i.product_id, i.quantity - 1)}
@@ -108,7 +157,7 @@ export default function CartDrawer() {
                             <Plus size={12} />
                           </button>
                         </div>
-                        <span className="text-xs font-semibold">
+                        <span className="text-xs font-bold font-mono">
                           {formatINR(i.price * i.quantity)}
                         </span>
                       </div>
@@ -116,6 +165,36 @@ export default function CartDrawer() {
                   </div>
                 );
               })
+            )}
+
+            {/* Bag Coupon Input */}
+            {items.length > 0 && hasAnyItemWithoutCoupon && (
+              <div className="p-3.5 rounded-2xl border border-dashed border-token surface-subtle space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold flex items-center gap-1.5">
+                    <Tag size={13} className="text-brand" /> Have a coupon code?
+                  </span>
+                </div>
+                <form onSubmit={handleApplyBagCoupon} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={bagCouponInput}
+                    onChange={(e) => {
+                      setBagCouponInput(e.target.value);
+                      if (bagCouponMsg) setBagCouponMsg("");
+                    }}
+                    placeholder="Enter coupon code"
+                    className="input flex-1 uppercase font-mono tracking-wider text-xs py-1.5 px-3"
+                  />
+                  <button
+                    type="submit"
+                    className="btn-primary py-1.5 px-3.5 text-xs font-bold shrink-0"
+                  >
+                    Apply
+                  </button>
+                </form>
+                {bagCouponMsg && <p className="text-[11px] text-red-400 font-medium">{bagCouponMsg}</p>}
+              </div>
             )}
           </div>
 
@@ -130,13 +209,21 @@ export default function CartDrawer() {
                 </div>
               )}
 
-              <div className="space-y-1 text-sm">
+              <div className="space-y-1.5 text-sm">
                 <div className="flex items-center justify-between text-xs muted">
                   <span>Total MRP</span>
-                  <span className="line-through">{formatINR(mrpTotal)}</span>
+                  <span className="line-through font-mono">{formatINR(mrpTotal)}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="muted text-sm">Final Amount</span>
+                {couponSavingsTotal > 0 && (
+                  <div className="flex items-center justify-between text-xs text-emerald-500 font-semibold">
+                    <span className="flex items-center gap-1">
+                      <Sparkles size={11} /> Coupon Discount (20% OFF)
+                    </span>
+                    <span className="font-mono">- {formatINR(couponSavingsTotal)}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-1 border-t divider">
+                  <span className="muted text-sm font-semibold">Final Amount</span>
                   <span className="font-mono text-2xl font-bold text-brand">{formatINR(subtotal)}</span>
                 </div>
               </div>

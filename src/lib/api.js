@@ -69,42 +69,96 @@ export function getProductDiscountPercent(productOrItem) {
   return 30;
 }
 
+// Coupon Configuration
+export const COUPON_CODE = "YOCHISI20";
+export const COUPON_DISCOUNT_PERCENT = 20;
+
+export function isValidCoupon(code) {
+  if (!code || typeof code !== "string") return false;
+  return code.trim().toUpperCase() === COUPON_CODE;
+}
+
 /**
- * Calculates displayed MRP, discounted price, savings and discount percentage
- * Dynamic calculation: UI shows increased MRP and applies discount to yield DB price
+ * Calculates displayed MRP, incremented regular price, coupon price, savings and discount percentage.
+ * Dynamic calculation:
+ * - Base price in DB is dbPrice (e.g. ₹699, ₹100, ₹299).
+ * - UI maintains an incremented regular price before coupon: regularPrice = Math.round(dbPrice / 0.8).
+ *   When the user manually applies coupon code YOCHISI20, 20% is discounted, bringing it down to dbPrice!
+ * - Sticker price (MRP) is calculated from regularPrice using category discount percent (50%, 40%, 30%).
+ * - hasCoupon: if true, returns dbPrice as active price. If false, returns regularPrice.
  */
-export function calculatePriceDetails(priceOrProduct, maybeProduct = null) {
-  let sellingPrice = 0;
+export function calculatePriceDetails(priceOrProduct, maybeProductOrHasCoupon = null, maybeHasCoupon = false) {
+  let dbPrice = 0;
   let product = null;
+  let hasCoupon = false;
 
   if (typeof priceOrProduct === "object" && priceOrProduct !== null) {
-    sellingPrice = Number(priceOrProduct.price) || 0;
     product = priceOrProduct;
+    dbPrice = Number(product.dbPrice !== undefined ? product.dbPrice : product.price) || 0;
+    if (Boolean(product.couponApplied)) {
+      hasCoupon = true;
+    }
   } else {
-    sellingPrice = Math.max(0, Number(priceOrProduct) || 0);
-    product = maybeProduct;
+    dbPrice = Math.max(0, Number(priceOrProduct) || 0);
+    if (typeof maybeProductOrHasCoupon === "object" && maybeProductOrHasCoupon !== null) {
+      product = maybeProductOrHasCoupon;
+    }
   }
 
-  if (sellingPrice === 0) {
-    return { price: 0, mrp: 0, savings: 0, discountPercent: 0 };
+  if (typeof maybeProductOrHasCoupon === "boolean") {
+    hasCoupon = maybeProductOrHasCoupon;
+  } else if (typeof maybeHasCoupon === "boolean") {
+    hasCoupon = maybeHasCoupon;
   }
 
-  const discountPercent = getProductDiscountPercent(product);
-  const ratio = (100 - discountPercent) / 100;
-  
-  let mrp = Math.round(sellingPrice / ratio);
-  if (discountPercent === 50 && sellingPrice === 699) {
-    mrp = 1398;
+  if (dbPrice === 0) {
+    return {
+      price: 0,
+      dbPrice: 0,
+      regularPrice: 0,
+      mrp: 0,
+      savings: 0,
+      couponSavings: 0,
+      discountPercent: 0,
+      categoryDiscountPercent: 0,
+      couponDiscountPercent: COUPON_DISCOUNT_PERCENT,
+      hasCoupon: false,
+    };
   }
 
-  const savings = Math.max(0, mrp - sellingPrice);
-  const actualDiscountPercent = mrp > 0 ? Math.round((savings / mrp) * 100) : discountPercent;
+  // 1. Incremented regular price (before coupon): regularPrice * 0.8 = dbPrice => regularPrice = dbPrice / 0.8
+  const regularPrice = Math.round(dbPrice / (1 - COUPON_DISCOUNT_PERCENT / 100));
+
+  // 2. Coupon savings (20% off regularPrice = exact difference to dbPrice)
+  const couponSavings = Math.max(0, regularPrice - dbPrice);
+
+  // 3. Active price (if coupon applied => dbPrice, else regularPrice)
+  const activePrice = hasCoupon ? dbPrice : regularPrice;
+
+  // 4. Category discount & Sticker MRP calculation
+  const categoryDiscountPercent = getProductDiscountPercent(product);
+  const ratio = (100 - categoryDiscountPercent) / 100;
+  let mrp = Math.round(regularPrice / ratio);
+
+  if (categoryDiscountPercent === 50 && regularPrice === 874) {
+    mrp = 1748;
+  }
+
+  // 5. Total savings from MRP
+  const savings = Math.max(0, mrp - activePrice);
+  const totalDiscountPercent = mrp > 0 ? Math.round((savings / mrp) * 100) : categoryDiscountPercent;
 
   return {
-    price: sellingPrice,
+    price: activePrice,
+    dbPrice,
+    regularPrice,
     mrp,
     savings,
-    discountPercent: actualDiscountPercent,
+    couponSavings,
+    discountPercent: totalDiscountPercent,
+    categoryDiscountPercent,
+    couponDiscountPercent: COUPON_DISCOUNT_PERCENT,
+    hasCoupon: Boolean(hasCoupon),
   };
 }
 
